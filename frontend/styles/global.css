@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@400;600;700&display=swap');
+
+/* Color Variables */
+:root {
+    --primary: #FF6B6B;
+    --secondary: #4ECDC4;
+    --accent: #FFE66D;
+    --bg-main: #1A1A2E;
+    --bg-card: rgba(22, 33, 62, 0.7);
+    --text-primary: #FFFFFF;
+    --text-secondary: #A8DADC;
+    --grad-1: linear-gradient(135deg, #FF6B6B, #FFE66D);
+    --grad-2: linear-gradient(135deg, #4ECDC4, #1A1A2E);
+}
+
+/* Global Reset & Typography */
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif !important;
+    background-color: var(--bg-main) !important;
+    color: var(--text-primary) !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* Hide Default Streamlit Elements */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+[data-testid="stSidebarNav"] {display: none;}
+
+/* Sidebar Styling */
+[data-testid="stSidebar"] {
+    background-color: #0F3460 !important;
+    border-right: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Gradient Text Utilities */
+.gradient-text {
+    background: var(--grad-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* Gradient Buttons Overlay */
+div.stButton > button {
+    background: var(--grad-1) !important;
+    color: var(--bg-main) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 10px 24px !important;
+    font-weight: 600 !important;
+    transition: transform 0.2s ease !important;
+    width: 100%;
+}
+
+div.stButton > button:hover {
+    transform: scale(1.05) !important;
+    color: var(--bg-main) !important;
+}
+
+/* Red Delete Button */
+div.stButton > button.btn-danger {
+    background: #FF4136 !important;
+    color: white !important;
+}
+
+/* Inputs and Selectboxes */
+.stTextInput > div > div > input, 
+.stNumberInput > div > div > input,
+.stDateInput > div > div > input {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 8px !important;
+}
+
+.stTextInput > div > div > input:focus,
+.stNumberInput > div > div > input:focus,
+.stDateInput > div > div > input:focus {
+    border-color: var(--secondary) !important;
+    box-shadow: 0 0 5px var(--secondary) !important;
+}
+
+/* Metrics Cards Override */
+[data-testid="stMetricValue"], [data-testid="stMetricLabel"] {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-main); 
+}
+::-webkit-scrollbar-thumb {
+    background: var(--secondary); 
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary); 
+}
+
+/* Animated Hero Background */
+.hero-gradient {
+    background: linear-gradient(-45deg, #FF6B6B, #4ECDC4, #FFE66D, #1A1A2E);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    padding: 3rem;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Chat Bubbles */
+.chat-user {
+    background: var(--grad-1);
+    color: var(--bg-main);
+    padding: 15px;
+    border-radius: 15px 15px 0 15px;
+    margin: 10px 0;
+    max-width: 80%;
+    float: right;
+    clear: both;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.chat-bot {
+    background: var(--bg-card);
+    border-left: 4px solid var(--secondary);
+    padding: 15px;
+    border-radius: 15px 15px 15px 0;
+    margin: 10px 0;
+    max-width: 80%;
+    float: left;
+    clear: both;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Divider */
+hr {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0), var(--secondary), rgba(255, 255, 255, 0));
+}
