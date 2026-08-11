@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nature's Perfect Hideaways - TravelMate AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <div id="app">
+      <div class="glass-container slide-up-anim">
+        <header class="header fade-in-anim delay-1">
+          <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 12L12 22L22 12L12 2Z" fill="#F5A623"/>
+            </svg>
+            TravelMate
+          </div>
+          <nav class="nav-links">
+            <a href="#">Locations</a>
+            <a href="#">Rooms</a>
+            <a href="#">Experiences</a>
+            <a href="#">Contact</a>
+            <button class="btn btn-outline">Book Now</button>
+          </nav>
+        </header>
+
+        <main class="main-content">
+          <div class="hero-text fade-in-anim delay-2">
+            <h1>Nature's<br>Perfect<br>Hideaways</h1>
+            <p class="hero-subtext">Discover handpicked luxury cabins in breathtaking locations. Unplug, unwind, and reconnect with what matters most.</p>
+            <div class="rating">
+              <span class="star">★ 4.7</span> <span class="reviews">from 1,800+ stays</span>
+            </div>
+          </div>
+
+          <div class="booking-card fade-in-anim delay-3">
+            <h3>Evergreen Pine Family Lodge</h3>
+            <form id="search-form" class="booking-form">
+              <div class="form-row">
+                <div class="input-group">
+                  <label>City</label>
+                  <input type="text" id="city" value="Aspen" placeholder="Where to?">
+                </div>
+                <div class="input-group">
+                  <label>Check In</label>
+                  <input type="date" id="checkin" value="2026-10-15">
+                </div>
+                <div class="input-group">
+                  <label>Check Out</label>
+                  <input type="date" id="checkout" value="2026-10-20">
+                </div>
+              </div>
+              <div class="price-row">
+                <div class="price">
+                  <span class="amount">$350</span><span class="per">/night</span>
+                </div>
+                <div class="guests">
+                  2-6 guests
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" id="search-btn">Reserve</button>
+            </form>
+            <div id="loading" class="hidden">Searching availability...</div>
+            <div id="results" class="results-container hidden"></div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

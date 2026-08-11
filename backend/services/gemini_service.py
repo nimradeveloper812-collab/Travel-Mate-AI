@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-2.0-flash')
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 def generate_itinerary(destination: str, days: int, budget: float, travel_style: str) -> str:
     prompt = f"""Create a detailed {days}-day travel itinerary for {destination}. 
