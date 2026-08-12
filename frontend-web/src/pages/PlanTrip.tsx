@@ -83,7 +83,7 @@ export default function PlanTrip() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 h-full items-start">
       
       {/* Parameters Panel */}
       <div className="lg:col-span-4 border border-slate-200/60 bg-white rounded-2xl p-6 shadow-sm space-y-6">
@@ -109,7 +109,7 @@ export default function PlanTrip() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Start Date</label>
               <input 

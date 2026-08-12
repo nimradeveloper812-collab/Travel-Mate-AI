@@ -76,7 +76,7 @@ export default function Flights() {
       {/* Parameter Form */}
       <div className="border border-slate-200/60 bg-white rounded-2xl p-6 shadow-sm">
         <h3 className="text-lg font-bold text-slate-800 mb-4">Find Flights</h3>
-        <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Origin City</label>
             <input 

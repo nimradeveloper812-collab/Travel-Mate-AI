@@ -45,33 +45,45 @@ export default function Auth() {
     setLoading(true);
     setServerError('');
 
-    const endpoint = isLogin ? '/auth/login' : '/auth/signup';
-    const payload = isLogin 
-      ? { email: formData.email, password: formData.password }
-      : { name: formData.name, email: formData.email, password: formData.password };
+
 
     try {
-      const response = await api.post(endpoint, payload);
-      
       if (isLogin) {
+        const response = await api.post('/auth/login', {
+          email: formData.email,
+          password: formData.password,
+        });
         localStorage.setItem('token', response.data.access_token);
         navigate('/dashboard');
       } else {
-        alert('Account created! Please sign in.');
-        setIsLogin(true);
-        setFormData({ name: '', email: '', password: '' });
+        // Signup first
+        await api.post('/auth/signup', {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        });
+        // Then auto-login immediately
+        const loginResponse = await api.post('/auth/login', {
+          email: formData.email,
+          password: formData.password,
+        });
+        localStorage.setItem('token', loginResponse.data.access_token);
+        navigate('/dashboard');
       }
     } catch (err: any) {
-      setServerError(
-        err.response?.data?.detail || 'Authentication failed. Please try again.'
-      );
+      const detail = err.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        setServerError(detail.map((d: any) => d.msg).join(', '));
+      } else {
+        setServerError(detail || 'Authentication failed. Please check your details and try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center bg-gradient-to-b from-sky-100 via-blue-50 to-white p-6 relative">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-sky-100 via-blue-50 to-white p-4 sm:p-6 relative overflow-y-auto">
       
       {/* Travel motifs */}
       <div className="absolute top-10 left-10 text-blue-200 pointer-events-none">
@@ -84,7 +96,7 @@ export default function Auth() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[420px] bg-white rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 p-8 z-10"
+        className="w-full max-w-[420px] bg-white rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 p-6 sm:p-8 z-10 my-8"
       >
         <div className="flex flex-col items-center mb-6">
           <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-blue-500/20 mb-3">
@@ -204,21 +216,7 @@ export default function Auth() {
           </motion.button>
         </form>
 
-        <div className="relative my-6 flex items-center">
-          <div className="flex-1 border-t border-slate-100" />
-          <span className="text-[10px] font-semibold text-slate-400 px-3 uppercase tracking-wider">or continue with</span>
-          <div className="flex-1 border-t border-slate-100" />
-        </div>
 
-        {/* Demo slots for future OAuth options */}
-        <div className="grid grid-cols-2 gap-4">
-          <button className="flex items-center justify-center space-x-2 py-2.5 border border-slate-100 hover:bg-slate-50 text-slate-600 rounded-xl text-xs font-semibold cursor-pointer interactive transition-colors">
-            <span>Google</span>
-          </button>
-          <button className="flex items-center justify-center space-x-2 py-2.5 border border-slate-100 hover:bg-slate-50 text-slate-600 rounded-xl text-xs font-semibold cursor-pointer interactive transition-colors">
-            <span>Apple</span>
-          </button>
-        </div>
       </motion.div>
     </div>
   );

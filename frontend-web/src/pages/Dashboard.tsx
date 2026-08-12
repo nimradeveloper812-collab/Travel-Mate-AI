@@ -54,12 +54,12 @@ export default function Dashboard() {
       <motion.div 
         initial={{ scale: 0.98, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="p-8 rounded-2xl bg-gradient-to-r from-blue-500 to-sky-400 text-white shadow-xl shadow-blue-500/10 flex flex-col md:flex-row md:items-center md:justify-between relative overflow-hidden"
+        className="p-5 sm:p-8 rounded-2xl bg-gradient-to-r from-blue-500 to-sky-400 text-white shadow-xl shadow-blue-500/10 flex flex-col md:flex-row md:items-center md:justify-between relative overflow-hidden"
       >
         {/* Subtle Background Globe Vector */}
         <div className="absolute -right-20 -bottom-20 w-80 h-80 border-4 border-white/5 rounded-full pointer-events-none" />
         <div className="space-y-2 z-10">
-          <h2 className="text-3xl font-extrabold tracking-tight">Adventure Awaits!</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Adventure Awaits!</h2>
           <p className="text-sky-50 font-medium max-w-lg">
             Plan custom itineraries with Gemini AI, lookup flight details, hotel capacities, and real-time weather details on the fly.
           </p>
@@ -67,7 +67,7 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         
         <div className="border border-slate-200/60 bg-white rounded-2xl p-6 shadow-sm flex items-center space-x-4">
           <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">

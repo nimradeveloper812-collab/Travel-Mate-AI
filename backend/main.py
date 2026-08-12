@@ -8,16 +8,17 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="TravelMate AI Backend")
 
-# CORS setup
+# CORS setup — allow localhost dev and all Netlify previews
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://*.netlify.app",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,   # must be False when using allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )
