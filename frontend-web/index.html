@@ -1,75 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nature's Perfect Hideaways - TravelMate AI</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/style.css">
-  </head>
-  <body>
-    <div id="app">
-      <div class="glass-container slide-up-anim">
-        <header class="header fade-in-anim delay-1">
-          <div class="logo">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 12L12 22L22 12L12 2Z" fill="#F5A623"/>
-            </svg>
-            TravelMate
-          </div>
-          <nav class="nav-links">
-            <a href="#">Locations</a>
-            <a href="#">Rooms</a>
-            <a href="#">Experiences</a>
-            <a href="#">Contact</a>
-            <button class="btn btn-outline">Book Now</button>
-          </nav>
-        </header>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TravelMate AI - Corporate Travel Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="dark-theme">
+  <div class="dashboard-wrapper">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="20" height="20" rx="6" fill="url(#brand-grad)"/>
+            <path d="M12 7L16 12H8L12 7Z" fill="white"/>
+            <path d="M12 17L8 12H16L12 17Z" fill="white"/>
+            <defs>
+              <linearGradient id="brand-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#3B82F6"/>
+                <stop offset="1" stop-color="#8B5CF6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="brand-name">TravelMate AI</span>
+      </div>
 
-        <main class="main-content">
-          <div class="hero-text fade-in-anim delay-2">
-            <h1>Nature's<br>Perfect<br>Hideaways</h1>
-            <p class="hero-subtext">Discover handpicked luxury cabins in breathtaking locations. Unplug, unwind, and reconnect with what matters most.</p>
-            <div class="rating">
-              <span class="star">★ 4.7</span> <span class="reviews">from 1,800+ stays</span>
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="#" class="nav-item active" data-view="dashboard">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-view="plan-trip">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+              <span>Plan Trip (AI)</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-view="chat">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              <span>AI Chat</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-view="flights">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+              <span>Flights</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-view="hotels">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              <span>Hotels</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-view="weather">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+              <span>Weather</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-view="saved-trips">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+              <span>Saved Trips</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Sidebar Footer (Auth Info) -->
+      <div class="sidebar-footer">
+        <div id="auth-user-info" class="user-profile hidden">
+          <div class="avatar" id="user-avatar-initial">U</div>
+          <div class="user-details">
+            <span class="user-name" id="display-user-name">User</span>
+            <span class="user-role">Explorer</span>
+          </div>
+          <button id="logout-btn" class="icon-btn" title="Logout">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
+        </div>
+        <div id="auth-prompt" class="auth-prompt-container">
+          <button class="btn btn-primary-sm" id="show-auth-modal-btn">Sign In / Register</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-layout">
+      
+      <!-- Top Header -->
+      <header class="top-header">
+        <h2 id="view-title">Dashboard</h2>
+        <div class="top-header-actions">
+          <div class="theme-badge">SaaS Edition</div>
+        </div>
+      </header>
+
+      <!-- Panel Views -->
+      <div class="view-panel">
+        
+        <!-- View 1: Dashboard -->
+        <div id="view-dashboard" class="pane-view active">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon purple">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Total Saved Trips</span>
+                <span class="stat-value" id="stat-total-trips">0</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Allocated Budget</span>
+                <span class="stat-value" id="stat-total-budget">$0</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon blue">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Favorite Spot</span>
+                <span class="stat-value" id="stat-fav-destination">—</span>
+              </div>
             </div>
           </div>
 
-          <div class="booking-card fade-in-anim delay-3">
-            <h3>Evergreen Pine Family Lodge</h3>
-            <form id="search-form" class="booking-form">
-              <div class="form-row">
-                <div class="input-group">
-                  <label>City</label>
-                  <input type="text" id="city" value="Aspen" placeholder="Where to?">
-                </div>
-                <div class="input-group">
-                  <label>Check In</label>
-                  <input type="date" id="checkin" value="2026-10-15">
-                </div>
-                <div class="input-group">
-                  <label>Check Out</label>
-                  <input type="date" id="checkout" value="2026-10-20">
-                </div>
+          <div class="dashboard-sections">
+            <div class="dashboard-card recent-activity">
+              <h3>Recently Planned Trip</h3>
+              <div id="recent-trip-details" class="empty-state">
+                No trips created yet. Click "Plan Trip" in the sidebar to get started.
               </div>
-              <div class="price-row">
-                <div class="price">
-                  <span class="amount">$350</span><span class="per">/night</span>
-                </div>
-                <div class="guests">
-                  2-6 guests
-                </div>
-              </div>
-              <button type="submit" class="btn btn-primary" id="search-btn">Reserve</button>
-            </form>
-            <div id="loading" class="hidden">Searching availability...</div>
-            <div id="results" class="results-container hidden"></div>
+            </div>
           </div>
-        </main>
+        </div>
+
+        <!-- View 2: Plan Trip -->
+        <div id="view-plan-trip" class="pane-view">
+          <div class="pane-split">
+            <div class="pane-form-column">
+              <div class="dashboard-card">
+                <h3>Generate AI Itinerary</h3>
+                <form id="itinerary-form" class="form-standard">
+                  <div class="form-group">
+                    <label>Destination City</label>
+                    <input type="text" id="plan-destination" placeholder="e.g. Paris, Tokyo, Aspen" required>
+                  </div>
+                  <div class="form-row-2">
+                    <div class="form-group">
+                      <label>Start Date</label>
+                      <input type="date" id="plan-start-date" required>
+                    </div>
+                    <div class="form-group">
+                      <label>End Date</label>
+                      <input type="date" id="plan-end-date" required>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Budget (USD)</label>
+                    <input type="number" id="plan-budget" value="1500" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Travel Style</label>
+                    <select id="plan-style">
+                      <option value="Luxury">Luxury</option>
+                      <option value="Budget">Budget / Backpacker</option>
+                      <option value="Adventure">Adventure</option>
+                      <option value="Family">Family Friendly</option>
+                      <option value="Relaxation">Relaxation</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn btn-primary" id="itinerary-btn">Generate Itinerary</button>
+                </form>
+              </div>
+            </div>
+            
+            <div class="pane-result-column">
+              <div class="dashboard-card result-card scroll-y">
+                <div class="result-header">
+                  <h3>AI Response & Suggestions</h3>
+                  <button id="save-itinerary-btn" class="btn btn-outline-sm hidden">Save Trip to Dashboard</button>
+                </div>
+                <div id="itinerary-output" class="empty-state">
+                  Enter trip details and generate to see your custom travel guide.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- View 3: AI Chat -->
+        <div id="view-chat" class="pane-view">
+          <div class="chat-container">
+            <div class="chat-messages" id="chat-box">
+              <div class="message system">
+                <div class="message-content">
+                  Welcome to TravelMate AI. Ask me about flight hacks, hotel recommendations, packing lists, or local customs!
+                </div>
+              </div>
+            </div>
+            <form id="chat-input-form" class="chat-input-area">
+              <input type="text" id="chat-message-input" placeholder="Type your travel question..." required>
+              <button type="submit" class="btn btn-primary-sm">Send</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- View 4: Flights -->
+        <div id="view-flights" class="pane-view">
+          <div class="dashboard-card">
+            <h3>Search Flights</h3>
+            <form id="flight-form" class="form-inline">
+              <div class="form-group">
+                <label>Origin</label>
+                <input type="text" id="flight-origin" value="New York" required>
+              </div>
+              <div class="form-group">
+                <label>Destination</label>
+                <input type="text" id="flight-destination" value="London" required>
+              </div>
+              <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="flight-date" required>
+              </div>
+              <div class="form-group align-end">
+                <button type="submit" class="btn btn-primary" id="flight-search-btn">Search Flights</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="dashboard-card mt-24">
+            <h3>Flight Results</h3>
+            <div id="flight-results-box" class="empty-state">
+              Fill details to fetch real-time flight offers via SkyScraper.
+            </div>
+          </div>
+        </div>
+
+        <!-- View 5: Hotels -->
+        <div id="view-hotels" class="pane-view">
+          <div class="dashboard-card">
+            <h3>Find Hotels</h3>
+            <form id="hotel-form-tabs" class="form-inline">
+              <div class="form-group">
+                <label>Destination City</label>
+                <input type="text" id="hotel-city" value="Miami" required>
+              </div>
+              <div class="form-group">
+                <label>Check In</label>
+                <input type="date" id="hotel-checkin" required>
+              </div>
+              <div class="form-group">
+                <label>Check Out</label>
+                <input type="date" id="hotel-checkout" required>
+              </div>
+              <div class="form-group align-end">
+                <button type="submit" class="btn btn-primary" id="hotel-search-btn-tabs">Search Hotels</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="dashboard-card mt-24">
+            <h3>Hotels Results</h3>
+            <div id="hotel-results-box" class="empty-state">
+              Submit search details to query hotel rates.
+            </div>
+          </div>
+        </div>
+
+        <!-- View 6: Weather -->
+        <div id="view-weather" class="pane-view">
+          <div class="dashboard-card">
+            <h3>Get Destination Weather</h3>
+            <form id="weather-form-tabs" class="form-inline">
+              <div class="form-group max-300">
+                <label>City Name</label>
+                <input type="text" id="weather-city" placeholder="e.g. Zurich" required>
+              </div>
+              <div class="form-group align-end">
+                <button type="submit" class="btn btn-primary" id="weather-search-btn-tabs">Get Forecast</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="dashboard-card mt-24">
+            <h3>5-Day Forecast Summary</h3>
+            <div id="weather-results-box" class="empty-state">
+              Fetch weather conditions to match your packing list.
+            </div>
+          </div>
+        </div>
+
+        <!-- View 7: Saved Trips -->
+        <div id="view-saved-trips" class="pane-view">
+          <div class="dashboard-card">
+            <div class="result-header">
+              <h3>All Planned Journeys</h3>
+            </div>
+            <div id="saved-trips-list" class="trips-grid mt-24">
+              <div class="empty-state">
+                You haven't saved any trips yet.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Auth modal (Sign in / Sign up overlay) -->
+  <div id="auth-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-mode-title">Sign In</h3>
+        <button class="close-modal" id="close-auth-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="auth-form" class="form-standard">
+          <div class="form-group hidden" id="signup-name-group">
+            <label>Full Name</label>
+            <input type="text" id="auth-name" placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="auth-email" placeholder="name@company.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="auth-password" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-primary mt-12" id="auth-submit-btn">Sign In</button>
+        </form>
+        <div class="modal-toggle-text">
+          <span id="auth-toggle-prompt">Don't have an account?</span>
+          <a href="#" id="auth-toggle-link">Register</a>
+        </div>
       </div>
     </div>
-    <script type="module" src="/main.js"></script>
-  </body>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
 </html>
