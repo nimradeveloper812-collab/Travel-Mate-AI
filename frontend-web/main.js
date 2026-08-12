@@ -1,3 +1,5 @@
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
 document.getElementById('search-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   
@@ -16,11 +18,7 @@ document.getElementById('search-form').addEventListener('submit', async (e) => {
   resultsContainer.innerHTML = '';
   
   try {
-    // Calling the FastAPI backend. Assuming auth is not strictly required or we'd need a login flow first.
-    // We will simulate the call or call it directly. Note: The backend requires a valid JWT for /hotels/search.
-    // For this demonstration of UI, we will catch 401s and show a mock result or error.
-    
-    const response = await fetch('http://localhost:8000/hotels/search', {
+    const response = await fetch(`${API_BASE}/hotels/search`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -31,7 +29,6 @@ document.getElementById('search-form').addEventListener('submit', async (e) => {
     });
     
     if (response.status === 401) {
-      // Show mock data since we aren't logged in on this new UI yet
       setTimeout(() => {
         resultsContainer.innerHTML = `
           <div class="result-item">
@@ -49,7 +46,6 @@ document.getElementById('search-form').addEventListener('submit', async (e) => {
     
     const data = await response.json();
     
-    // Display results
     if (data.data && data.data.length > 0) {
       data.data.slice(0, 3).forEach(hotel => {
         resultsContainer.innerHTML += `
