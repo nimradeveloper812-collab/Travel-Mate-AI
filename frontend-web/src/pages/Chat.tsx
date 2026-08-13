@@ -8,6 +8,14 @@ interface Message {
   content: string;
 }
 
+const formatMessageContent = (text: string) => {
+  if (!text) return '';
+  return text
+    .replace(/^#+\s+/gm, '') // Remove markdown heading hashes
+    .replace(/\*\*/g, '')    // Remove markdown bold double asterisks
+    .replace(/\*/g, '•');    // Convert single asterisks to bullets (if any remain)
+};
+
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -94,14 +102,14 @@ export default function Chat() {
               </div>
 
               {/* Message Content Bubble */}
-              <div className={`p-4 rounded-2xl text-sm leading-relaxed border ${
+              <div className={`p-4 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap border ${
                 msg.role === 'user'
                   ? 'bg-blue-600 text-white border-blue-500 rounded-tr-none'
                   : msg.role === 'system' && msg.content.startsWith('Error')
                   ? 'bg-red-50 border-red-100 text-red-700'
                   : 'bg-slate-50 border-slate-100/80 text-slate-700 rounded-tl-none'
               }`}>
-                {msg.content}
+                {formatMessageContent(msg.content)}
               </div>
             </motion.div>
           ))}
