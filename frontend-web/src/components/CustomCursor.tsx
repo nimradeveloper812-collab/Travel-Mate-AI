@@ -70,27 +70,17 @@ export default function CustomCursor() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-sky-400 pointer-events-none z-50 mix-blend-difference flex items-center justify-center"
+      className="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-blue-500 pointer-events-none z-50 flex items-center justify-center"
       style={{
         x: cursorXSpring,
         y: cursorYSpring,
       }}
       animate={{
         scale: cursorType === 'pointer' ? 1.5 : cursorType === 'click' ? 0.8 : 1,
-        backgroundColor: cursorType === 'pointer' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(56, 189, 248, 0)',
-        borderColor: cursorType === 'click' ? '#0ea5e9' : '#38bdf8',
+        backgroundColor: cursorType === 'pointer' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0)',
+        borderColor: cursorType === 'click' ? '#1d4ed8' : '#3b82f6',
       }}
       transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-    >
-      {cursorType === 'pointer' && (
-        <motion.span
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-[8px] font-bold text-sky-200"
-        >
-          ✈
-        </motion.span>
-      )}
-    </motion.div>
+    />
   );
 }
