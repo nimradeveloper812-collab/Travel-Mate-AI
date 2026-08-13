@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AlertCircle } from 'lucide-react';
 import api from '../lib/api';
 import { TableShimmer } from '../components/Shimmer';
@@ -22,6 +22,47 @@ export default function Flights() {
   const [loading, setLoading] = useState(false);
   const [flights, setFlights] = useState<FlightItem[] | null>(null);
   const [fallbackMode, setFallbackMode] = useState(false);
+  const [trips, setTrips] = useState<any[]>([]);
+  const [savingIdx, setSavingIdx] = useState<number | null>(null);
+  const [saveTripIds, setSaveTripIds] = useState<{[key: number]: string}>({});
+
+  useEffect(() => {
+    const fetchTrips = async () => {
+      try {
+        const response = await api.get('/trips/my-trips');
+        setTrips(response.data);
+      } catch (err) {
+        console.error('Error fetching trips', err);
+      }
+    };
+    fetchTrips();
+  }, []);
+
+  const handleSaveToTrip = async (idx: number, flight: FlightItem) => {
+    const tripId = saveTripIds[idx];
+    if (!tripId) {
+      alert('Please select a trip first.');
+      return;
+    }
+    setSavingIdx(idx);
+    try {
+      const leg = flight.legs[0];
+      const carrier = leg.carriers[0]?.marketing[0]?.name || 'Unknown Airline';
+      await api.post(`/trips/${tripId}/flights`, {
+        carrier,
+        departure: leg.departure,
+        arrival: leg.arrival,
+        stopCount: leg.stopCount,
+        price: flight.price.formatted
+      });
+      alert('Flight added to your trip successfully!');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to add flight to trip.');
+    } finally {
+      setSavingIdx(null);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -145,6 +186,7 @@ export default function Flights() {
                     <th className="pb-4">Arrival</th>
                     <th className="pb-4">Stops</th>
                     <th className="pb-4">Price</th>
+                    <th className="pb-4 text-right">Link to Trip</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 text-sm">
@@ -163,6 +205,29 @@ export default function Flights() {
                           {leg.stopCount === 0 ? 'Direct' : `${leg.stopCount} stops`}
                         </td>
                         <td className="py-4 font-black text-emerald-600 text-base">{fl.price.formatted}</td>
+                        <td className="py-4 text-right">
+                          <div className="flex items-center justify-end space-x-2">
+                            <select
+                              value={saveTripIds[idx] || ''}
+                              onChange={(e) => setSaveTripIds({...saveTripIds, [idx]: e.target.value})}
+                              className="px-2 py-1.5 border border-slate-200 rounded-lg text-xs bg-white focus:border-blue-500 outline-none"
+                            >
+                              <option value="">Select Trip...</option>
+                              {trips.map((trip) => (
+                                <option key={trip.id} value={trip.id}>
+                                  {trip.destination} ({trip.start_date})
+                                </option>
+                              ))}
+                            </select>
+                            <button
+                              onClick={() => handleSaveToTrip(idx, fl)}
+                              disabled={savingIdx === idx}
+                              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer interactive"
+                            >
+                              {savingIdx === idx ? 'Saving...' : 'Add'}
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     );
                   })}

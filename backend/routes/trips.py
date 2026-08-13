@@ -81,3 +81,57 @@ def delete_trip(
     db.delete(trip)
     db.commit()
     return {"message": "Trip deleted successfully"}
+
+@router.post("/{trip_id}/flights")
+def add_flight_to_trip(
+    trip_id: int,
+    payload: dict,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    trip = db.query(models.Trip).filter(models.Trip.id == trip_id, models.Trip.user_id == current_user.id).first()
+    if not trip:
+        raise HTTPException(status_code=404, detail="Trip not found")
+    
+    import json
+    existing_flights = []
+    if trip.flights_json:
+        try:
+            existing_flights = json.loads(trip.flights_json)
+            if not isinstance(existing_flights, list):
+                existing_flights = [existing_flights]
+        except Exception:
+            existing_flights = []
+            
+    existing_flights.append(payload)
+    trip.flights_json = json.dumps(existing_flights)
+    db.commit()
+    db.refresh(trip)
+    return {"message": "Flight added to trip successfully", "flights": existing_flights}
+
+@router.post("/{trip_id}/hotels")
+def add_hotel_to_trip(
+    trip_id: int,
+    payload: dict,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    trip = db.query(models.Trip).filter(models.Trip.id == trip_id, models.Trip.user_id == current_user.id).first()
+    if not trip:
+        raise HTTPException(status_code=404, detail="Trip not found")
+        
+    import json
+    existing_hotels = []
+    if trip.hotels_json:
+        try:
+            existing_hotels = json.loads(trip.hotels_json)
+            if not isinstance(existing_hotels, list):
+                existing_hotels = [existing_hotels]
+        except Exception:
+            existing_hotels = []
+            
+    existing_hotels.append(payload)
+    trip.hotels_json = json.dumps(existing_hotels)
+    db.commit()
+    db.refresh(trip)
+    return {"message": "Hotel added to trip successfully", "hotels": existing_hotels}

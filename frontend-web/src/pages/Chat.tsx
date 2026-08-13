@@ -26,6 +26,20 @@ export default function Chat() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const [trips, setTrips] = useState<any[]>([]);
+  const [selectedTripId, setSelectedTripId] = useState<string>('');
+
+  useEffect(() => {
+    const fetchTrips = async () => {
+      try {
+        const response = await api.get('/trips/my-trips');
+        setTrips(response.data);
+      } catch (err) {
+        console.error('Error fetching trips in Chat', err);
+      }
+    };
+    fetchTrips();
+  }, []);
 
   // Scroll to bottom on updates
   useEffect(() => {
@@ -54,7 +68,8 @@ export default function Chat() {
 
       const response = await api.post('/chat/message', {
         message: query,
-        history: history
+        history: history,
+        trip_id: selectedTripId ? parseInt(selectedTripId) : null
       });
 
       setMessages((prev) => [
@@ -77,6 +92,23 @@ export default function Chat() {
   return (
     <div className="flex flex-col h-[calc(100vh-170px)] border border-slate-200/60 bg-white rounded-2xl overflow-hidden shadow-sm">
       
+      {/* Trip Context Select Bar */}
+      <div className="bg-slate-50 border-b border-slate-100 p-3 px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+        <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">AI Chat Context:</span>
+        <select
+          value={selectedTripId}
+          onChange={(e) => setSelectedTripId(e.target.value)}
+          className="px-3 py-1.5 border border-slate-200 rounded-xl text-xs bg-white focus:border-blue-500 outline-none w-full sm:w-60 cursor-pointer interactive"
+        >
+          <option value="">No Trip Selected (General Chat)</option>
+          {trips.map((trip) => (
+            <option key={trip.id} value={trip.id}>
+              Chat about: {trip.destination} ({trip.start_date})
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Messages Viewport */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         <AnimatePresence initial={false}>

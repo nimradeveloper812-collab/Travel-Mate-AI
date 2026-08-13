@@ -56,7 +56,7 @@ Return ONLY valid JSON in this exact format (no markdown, no extra text):
     except Exception as e:
         raise Exception(f"Gemini API error: {str(e)}")
 
-def chat_with_ai(message: str, history: list) -> str:
+def chat_with_ai(message: str, history: list, trip_context: str = "") -> str:
     system_prompt = (
         "You are TravelMate AI, an elite, professional, and friendly travel assistant. "
         "Provide helpful, highly accurate, and beautifully structured travel advice. "
@@ -76,6 +76,9 @@ def chat_with_ai(message: str, history: list) -> str:
         "   - 🌟 for highlights\n"
         "5. Keep the tone helpful, professional, and engaging."
     )
+    
+    if trip_context:
+        system_prompt += f"\n\n{trip_context}"
 
     # Build chat history — Gemini only accepts 'user' and 'model' roles
     chat_history = []

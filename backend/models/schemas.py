@@ -51,6 +51,7 @@ class ItineraryResponse(BaseModel):
 class ChatMessage(BaseModel):
     message: str
     history: List[dict] = []
+    trip_id: Optional[int] = None
 
 # Search Schemas
 class SearchCreate(BaseModel):

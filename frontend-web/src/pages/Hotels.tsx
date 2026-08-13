@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AlertCircle } from 'lucide-react';
 import api from '../lib/api';
 import { TableShimmer } from '../components/Shimmer';
@@ -18,6 +18,43 @@ export default function Hotels() {
   const [loading, setLoading] = useState(false);
   const [hotels, setHotels] = useState<HotelItem[] | null>(null);
   const [fallbackMode, setFallbackMode] = useState(false);
+  const [trips, setTrips] = useState<any[]>([]);
+  const [savingIdx, setSavingIdx] = useState<number | null>(null);
+  const [saveTripIds, setSaveTripIds] = useState<{[key: number]: string}>({});
+
+  useEffect(() => {
+    const fetchTrips = async () => {
+      try {
+        const response = await api.get('/trips/my-trips');
+        setTrips(response.data);
+      } catch (err) {
+        console.error('Error fetching trips', err);
+      }
+    };
+    fetchTrips();
+  }, []);
+
+  const handleSaveToTrip = async (idx: number, hotel: HotelItem) => {
+    const tripId = saveTripIds[idx];
+    if (!tripId) {
+      alert('Please select a trip first.');
+      return;
+    }
+    setSavingIdx(idx);
+    try {
+      await api.post(`/trips/${tripId}/hotels`, {
+        name: hotel.name,
+        stars: hotel.stars,
+        price: hotel.price || 120
+      });
+      alert('Hotel added to your trip successfully!');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to add hotel to trip.');
+    } finally {
+      setSavingIdx(null);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -130,6 +167,7 @@ export default function Hotels() {
                     <th className="pb-4">Property</th>
                     <th className="pb-4">Rating</th>
                     <th className="pb-4">Est. Rate</th>
+                    <th className="pb-4 text-right">Link to Trip</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 text-sm">
@@ -140,6 +178,29 @@ export default function Hotels() {
                         {'★'.repeat(Math.round(h.stars || 3))}
                       </td>
                       <td className="py-4 font-black text-emerald-600 text-base">${h.price || 120} / night</td>
+                      <td className="py-4 text-right">
+                        <div className="flex items-center justify-end space-x-2">
+                          <select
+                            value={saveTripIds[idx] || ''}
+                            onChange={(e) => setSaveTripIds({...saveTripIds, [idx]: e.target.value})}
+                            className="px-2 py-1.5 border border-slate-200 rounded-lg text-xs bg-white focus:border-blue-500 outline-none"
+                          >
+                            <option value="">Select Trip...</option>
+                            {trips.map((trip) => (
+                              <option key={trip.id} value={trip.id}>
+                                {trip.destination} ({trip.start_date})
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={() => handleSaveToTrip(idx, h)}
+                            disabled={savingIdx === idx}
+                            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer interactive"
+                          >
+                            {savingIdx === idx ? 'Saving...' : 'Add'}
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

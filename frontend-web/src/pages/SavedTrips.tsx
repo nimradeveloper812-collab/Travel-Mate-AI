@@ -11,6 +11,8 @@ interface Trip {
   budget: number;
   travel_style: string;
   itinerary_json: string;
+  flights_json?: string;
+  hotels_json?: string;
 }
 
 export default function SavedTrips() {
@@ -113,6 +115,18 @@ export default function SavedTrips() {
       {/* Details Viewport Modal */}
       {selectedTrip && (() => {
         const details = getParsedItinerary(selectedTrip.itinerary_json);
+        let flights = [];
+        if (selectedTrip.flights_json) {
+          try {
+            flights = JSON.parse(selectedTrip.flights_json);
+          } catch(e){}
+        }
+        let hotels = [];
+        if (selectedTrip.hotels_json) {
+          try {
+            hotels = JSON.parse(selectedTrip.hotels_json);
+          } catch(e){}
+        }
         return (
           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-6 z-50">
             <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden relative">
@@ -169,6 +183,44 @@ export default function SavedTrips() {
                         <li key={index}>{tip}</li>
                       ))}
                     </ul>
+                  </div>
+                )}
+
+                {/* Flights Section */}
+                {flights && flights.length > 0 && (
+                  <div className="border border-slate-100 bg-blue-50/20 rounded-2xl p-5 space-y-3">
+                    <h5 className="font-bold text-slate-800 flex items-center space-x-2">
+                      <span>✈️ Saved Flights</span>
+                    </h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {flights.map((f: any, i: number) => (
+                        <div key={i} className="p-3 bg-white border border-slate-200 rounded-xl space-y-1 text-xs">
+                          <p className="font-bold text-slate-800">{f.carrier}</p>
+                          <p className="text-slate-500">Departure: {new Date(f.departure).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                          <p className="text-slate-500">Arrival: {new Date(f.arrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                          <p className="text-slate-400">{f.stopCount === 0 ? 'Direct' : `${f.stopCount} stops`}</p>
+                          <p className="font-bold text-emerald-600 pt-1 text-sm">{f.price}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Hotels Section */}
+                {hotels && hotels.length > 0 && (
+                  <div className="border border-slate-100 bg-emerald-50/20 rounded-2xl p-5 space-y-3">
+                    <h5 className="font-bold text-slate-800 flex items-center space-x-2">
+                      <span>🏨 Saved Hotels</span>
+                    </h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {hotels.map((h: any, i: number) => (
+                        <div key={i} className="p-3 bg-white border border-slate-200 rounded-xl space-y-1 text-xs">
+                          <p className="font-bold text-slate-800">{h.name}</p>
+                          <p className="text-amber-500">{'★'.repeat(Math.round(h.stars || 3))}</p>
+                          <p className="font-bold text-emerald-600 pt-1 text-sm">${h.price} / night</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
