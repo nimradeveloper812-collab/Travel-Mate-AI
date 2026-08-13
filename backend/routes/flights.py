@@ -36,7 +36,10 @@ def find_flights(
         db.refresh(new_search)
         
         return flights_data
+    except HTTPException:
+        raise
     except Exception as e:
-        if "limit reached" in str(e).lower():
+        err_str = str(e).lower()
+        if "rate limit" in err_str or "limit reached" in err_str:
             raise HTTPException(status_code=429, detail=str(e))
         raise HTTPException(status_code=500, detail=str(e))

@@ -34,7 +34,7 @@ def get_dashboard_stats(user_id: int, db: Session) -> dict:
     if trips:
         # sort by created_at descending
         recent_trip_model = sorted(trips, key=lambda x: x.created_at, reverse=True)[0]
-        recent_trip = schemas.TripResponse.from_orm(recent_trip_model)
+        recent_trip = schemas.TripResponse.model_validate(recent_trip_model)
 
     return {
         "total_trips": total_trips,

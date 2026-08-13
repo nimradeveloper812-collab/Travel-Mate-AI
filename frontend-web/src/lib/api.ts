@@ -19,9 +19,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
+    const isAuthRoute = error.config?.url?.includes('/auth/');
+    if (error.response && error.response.status === 401 && !isAuthRoute) {
       localStorage.removeItem('token');
-      // Redirect to login if user is on an authenticated page
+      // Redirect to login only if on an authenticated page, not on the auth page itself
       if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
         window.location.href = '/login';
       }

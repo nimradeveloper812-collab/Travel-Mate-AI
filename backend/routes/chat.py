@@ -13,5 +13,7 @@ def send_message(
     try:
         response = chat_with_ai(request.message, request.history)
         return {"response": response}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

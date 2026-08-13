@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Optional
 from datetime import datetime
 import json
 
@@ -13,7 +12,7 @@ router = APIRouter(prefix="/itinerary", tags=["itinerary"])
 
 @router.post("/generate")
 def create_itinerary(
-    request: schemas.ItineraryRequest, 
+    request: schemas.ItineraryRequest,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -21,17 +20,22 @@ def create_itinerary(
         start = datetime.strptime(request.start_date, "%Y-%m-%d")
         end = datetime.strptime(request.end_date, "%Y-%m-%d")
         days = (end - start).days + 1
-        
+
         if days <= 0:
-            raise HTTPException(status_code=400, detail="End date must be after start date")
-            
+            raise HTTPException(status_code=400, detail="End date must be after start date.")
+        if days > 30:
+            raise HTTPException(status_code=400, detail="Itinerary cannot exceed 30 days.")
+
         itinerary_json_str = generate_itinerary(
             destination=request.destination,
             days=days,
             budget=request.budget,
             travel_style=request.travel_style
         )
-        
+
+        # Parse to validate before saving
+        itinerary_data = json.loads(itinerary_json_str)
+
         # Save to DB
         new_itinerary = models.Itinerary(
             user_id=current_user.id,
@@ -45,8 +49,15 @@ def create_itinerary(
         db.add(new_itinerary)
         db.commit()
         db.refresh(new_itinerary)
-        
-        return json.loads(itinerary_json_str)
-        
+
+        return itinerary_data
+
+    except HTTPException:
+        raise
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=500,
+            detail="AI returned an invalid response. Please try again."
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

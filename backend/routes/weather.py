@@ -30,5 +30,7 @@ def find_weather(
         db.refresh(new_search)
         
         return weather_data
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
