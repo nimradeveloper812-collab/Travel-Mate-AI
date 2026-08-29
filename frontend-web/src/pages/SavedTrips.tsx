@@ -286,7 +286,8 @@ export default function SavedTrips() {
                 </div>
 
                 {/* Modal Tab Navigation */}
-                <div className="flex border-b border-slate-100 bg-white px-6">
+                <div className="flex border-b border-slate-100 bg-white px-4 sm:px-6 overflow-x-auto no-scrollbar gap-2 sm:gap-4">
+
                   {[
                     { id: 'itinerary', label: 'Day-by-Day Plan' },
                     { id: 'bookings', label: `Flights & Hotels (${flights.length + hotels.length})` },
