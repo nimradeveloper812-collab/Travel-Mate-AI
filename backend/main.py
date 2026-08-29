@@ -12,14 +12,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 try:
-    from backend.database import engine, Base
+    from backend.database import engine, Base, init_db
     from backend.routes import auth, itinerary, chat, flights, hotels, weather, trips
 except ImportError:
-    from database import engine, Base
+    from database import engine, Base, init_db
     from routes import auth, itinerary, chat, flights, hotels, weather, trips
 
-# Create tables automatically on startup
-Base.metadata.create_all(bind=engine)
+# Initialize and auto-migrate tables
+init_db()
+
 
 app = FastAPI(
     title="TravelMate AI Backend API",
