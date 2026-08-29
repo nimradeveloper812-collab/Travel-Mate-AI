@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 # Auth Schemas
@@ -20,9 +20,30 @@ class UserResponse(BaseModel):
     id: int
     name: str
     email: str
+    home_city: Optional[str] = ""
+    preferred_currency: Optional[str] = "USD"
+    travel_style: Optional[str] = "Adventure"
+    bio: Optional[str] = ""
+    created_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True
+
+class UserProfileUpdate(BaseModel):
+    name: Optional[str] = None
+    home_city: Optional[str] = None
+    preferred_currency: Optional[str] = None
+    travel_style: Optional[str] = None
+    bio: Optional[str] = None
+    current_password: Optional[str] = None
+    new_password: Optional[str] = None
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
 
 # Itinerary Schemas
 class ItineraryRequest(BaseModel):
@@ -96,6 +117,19 @@ class TripCreate(BaseModel):
     flights_json: Optional[str] = None
     hotels_json: Optional[str] = None
     weather_json: Optional[str] = None
+    notes_json: Optional[str] = None
+
+class TripUpdate(BaseModel):
+    destination: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    budget: Optional[float] = None
+    travel_style: Optional[str] = None
+    itinerary_json: Optional[str] = None
+    flights_json: Optional[str] = None
+    hotels_json: Optional[str] = None
+    weather_json: Optional[str] = None
+    notes_json: Optional[str] = None
 
 class TripResponse(BaseModel):
     id: int
@@ -106,9 +140,10 @@ class TripResponse(BaseModel):
     budget: float
     travel_style: str
     itinerary_json: str
-    flights_json: Optional[str]
-    hotels_json: Optional[str]
-    weather_json: Optional[str]
+    flights_json: Optional[str] = None
+    hotels_json: Optional[str] = None
+    weather_json: Optional[str] = None
+    notes_json: Optional[str] = None
     created_at: datetime
     
     class Config:
@@ -121,5 +156,6 @@ class DashboardStats(BaseModel):
     trips_per_month: dict
     travel_styles: dict
     recent_trip: Optional[TripResponse]
+
 
 

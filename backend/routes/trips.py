@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+import json
 
 from backend.database import get_db
 from backend.models import models, schemas
@@ -26,7 +27,8 @@ def save_trip(
             itinerary_json=request.itinerary_json,
             flights_json=request.flights_json,
             hotels_json=request.hotels_json,
-            weather_json=request.weather_json
+            weather_json=request.weather_json,
+            notes_json=request.notes_json
         )
         db.add(new_trip)
         db.commit()
@@ -68,6 +70,42 @@ def get_trip(
         raise HTTPException(status_code=404, detail="Trip not found")
     return trip
 
+@router.put("/{trip_id}", response_model=schemas.TripResponse)
+def update_trip(
+    trip_id: int,
+    request: schemas.TripUpdate,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    trip = db.query(models.Trip).filter(models.Trip.id == trip_id, models.Trip.user_id == current_user.id).first()
+    if not trip:
+        raise HTTPException(status_code=404, detail="Trip not found")
+
+    if request.destination is not None:
+        trip.destination = request.destination
+    if request.start_date is not None:
+        trip.start_date = request.start_date
+    if request.end_date is not None:
+        trip.end_date = request.end_date
+    if request.budget is not None:
+        trip.budget = request.budget
+    if request.travel_style is not None:
+        trip.travel_style = request.travel_style
+    if request.itinerary_json is not None:
+        trip.itinerary_json = request.itinerary_json
+    if request.flights_json is not None:
+        trip.flights_json = request.flights_json
+    if request.hotels_json is not None:
+        trip.hotels_json = request.hotels_json
+    if request.weather_json is not None:
+        trip.weather_json = request.weather_json
+    if request.notes_json is not None:
+        trip.notes_json = request.notes_json
+
+    db.commit()
+    db.refresh(trip)
+    return trip
+
 @router.delete("/{trip_id}")
 def delete_trip(
     trip_id: int,
@@ -93,7 +131,6 @@ def add_flight_to_trip(
     if not trip:
         raise HTTPException(status_code=404, detail="Trip not found")
     
-    import json
     existing_flights = []
     if trip.flights_json:
         try:
@@ -120,7 +157,6 @@ def add_hotel_to_trip(
     if not trip:
         raise HTTPException(status_code=404, detail="Trip not found")
         
-    import json
     existing_hotels = []
     if trip.hotels_json:
         try:
@@ -135,3 +171,4 @@ def add_hotel_to_trip(
     db.commit()
     db.refresh(trip)
     return {"message": "Hotel added to trip successfully", "hotels": existing_hotels}
+

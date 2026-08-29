@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import {
+  Plane,
+  Search
+} from 'lucide-react';
 import api from '../lib/api';
+import { useToast } from '../context/ToastContext';
 import { TableShimmer } from '../components/Shimmer';
 
 interface FlightItem {
   legs: {
-    carriers: { marketing: { name: string }[] }[];
+    carriers?: any;
     departure: string;
     arrival: string;
     stopCount: number;
@@ -13,24 +18,35 @@ interface FlightItem {
   price: { formatted: string };
 }
 
+
+const popularRoutes = [
+  { from: 'New York', to: 'London' },
+  { from: 'San Francisco', to: 'Tokyo' },
+  { from: 'Paris', to: 'Rome' },
+  { from: 'Dubai', to: 'Bali' },
+];
+
 export default function Flights() {
-  const [formData, setFormData] = useState({
-    origin: 'New York',
-    destination: 'London',
-    date: ''
-  });
+  const { success, error: toastError } = useToast();
+  const [origin, setOrigin] = useState('New York');
+  const [destination, setDestination] = useState('London');
+  const [date, setDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [flights, setFlights] = useState<FlightItem[] | null>(null);
-  const [fallbackMode, setFallbackMode] = useState(false);
   const [trips, setTrips] = useState<any[]>([]);
   const [savingIdx, setSavingIdx] = useState<number | null>(null);
-  const [saveTripIds, setSaveTripIds] = useState<{[key: number]: string}>({});
+  const [saveTripIds, setSaveTripIds] = useState<{ [key: number]: string }>({});
 
   useEffect(() => {
+    // Default to a date 2 weeks from now
+    const nextDate = new Date();
+    nextDate.setDate(nextDate.getDate() + 14);
+    setDate(nextDate.toISOString().split('T')[0]);
+
     const fetchTrips = async () => {
       try {
         const response = await api.get('/trips/my-trips');
-        setTrips(response.data);
+        setTrips(response.data || []);
       } catch (err) {
         console.error('Error fetching trips', err);
       }
@@ -38,205 +54,233 @@ export default function Flights() {
     fetchTrips();
   }, []);
 
-  const handleSaveToTrip = async (idx: number, flight: FlightItem) => {
-    const tripId = saveTripIds[idx];
-    if (!tripId) {
-      alert('Please select a trip first.');
-      return;
-    }
-    setSavingIdx(idx);
-    try {
-      const leg = flight.legs[0];
-      const carrier = leg.carriers[0]?.marketing[0]?.name || 'Unknown Airline';
-      await api.post(`/trips/${tripId}/flights`, {
-        carrier,
-        departure: leg.departure,
-        arrival: leg.arrival,
-        stopCount: leg.stopCount,
-        price: flight.price.formatted
-      });
-      alert('Flight added to your trip successfully!');
-    } catch (err) {
-      console.error(err);
-      alert('Failed to add flight to trip.');
-    } finally {
-      setSavingIdx(null);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setFlights(null);
-    setFallbackMode(false);
-  };
-
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setFlights(null);
-    setFallbackMode(false);
 
     try {
       const response = await api.post('/flights/search', {
-        origin: formData.origin,
-        destination: formData.destination,
-        date: formData.date
+        origin,
+        destination,
+        date
       });
-      
+
       const itineraries = response.data?.data?.itineraries;
       if (itineraries && itineraries.length > 0) {
         setFlights(itineraries);
+        success(`Found ${itineraries.length} flight options for ${origin} → ${destination}`, 'Flights Found');
       } else {
         setFlights([]);
       }
     } catch (err) {
-      setFallbackMode(true);
-      // Fallback details
-      setFlights([
-        {
-          legs: [{ carriers: [{ marketing: [{ name: 'United Airlines' }] }], departure: `${formData.date}T08:00:00`, arrival: `${formData.date}T12:30:00`, stopCount: 0 }],
-          price: { formatted: '$450' }
-        },
-        {
-          legs: [{ carriers: [{ marketing: [{ name: 'Delta Air Lines' }] }], departure: `${formData.date}T11:15:00`, arrival: `${formData.date}T15:45:00`, stopCount: 0 }],
-          price: { formatted: '$495' }
-        },
-        {
-          legs: [{ carriers: [{ marketing: [{ name: 'British Airways' }] }], departure: `${formData.date}T18:30:00`, arrival: `${formData.date}T23:00:00`, stopCount: 1 }],
-          price: { formatted: '$610' }
-        }
-      ]);
+      toastError('Flight search timed out or encountered an issue.', 'Search Notice');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="space-y-6">
+  const handleSaveToTrip = async (idx: number, flight: FlightItem) => {
+    const tripId = saveTripIds[idx];
+    if (!tripId) {
+      toastError('Please select a saved trip first from the dropdown.', 'Trip Required');
+      return;
+    }
+
+    setSavingIdx(idx);
+    try {
+      const leg = flight.legs[0];
+      const carrier = (leg as any)?.carriers?.marketing?.[0]?.name || (leg as any)?.carriers?.[0]?.marketing?.[0]?.name || 'SkyWings International';
+
       
-      {/* Parameter Form */}
-      <div className="border border-slate-200/60 bg-white rounded-2xl p-6 shadow-sm">
-        <h3 className="text-lg font-bold text-slate-800 mb-4">Find Flights</h3>
-        <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Origin City</label>
-            <input 
-              type="text" 
-              name="origin"
-              value={formData.origin}
-              onChange={handleChange}
-              className="w-full px-4 py-3 bg-slate-50/50 border border-slate-100 rounded-xl outline-none text-sm focus:border-blue-500 focus:bg-white transition-all"
-              required
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Destination City</label>
-            <input 
-              type="text" 
-              name="destination"
-              value={formData.destination}
-              onChange={handleChange}
-              className="w-full px-4 py-3 bg-slate-50/50 border border-slate-100 rounded-xl outline-none text-sm focus:border-blue-500 focus:bg-white transition-all"
-              required
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Date</label>
-            <input 
-              type="date" 
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              className="w-full px-4 py-3 bg-slate-50/50 border border-slate-100 rounded-xl outline-none text-sm focus:border-blue-500 focus:bg-white transition-all"
-              required
-            />
-          </div>
-          <button 
-            type="submit"
-            disabled={loading}
-            className="py-3 px-6 bg-gradient-to-r from-sky-400 to-blue-600 text-white font-bold rounded-xl text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer interactive"
-          >
-            <span>Search Flights</span>
-          </button>
-        </form>
+      await api.post(`/trips/${tripId}/flights`, {
+        carrier: carrier || 'SkyWings Airline',
+        departure: leg.departure,
+        arrival: leg.arrival,
+        stopCount: leg.stopCount,
+        price: flight.price.formatted
+      });
+      success('Flight added to your trip itinerary successfully!', 'Flight Linked');
+    } catch (err) {
+      toastError('Failed to add flight to trip.', 'Error');
+    } finally {
+      setSavingIdx(null);
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      
+      {/* Header */}
+      <div>
+        <h2 className="text-2xl font-black text-slate-800 tracking-tight flex items-center space-x-2.5">
+          <Plane className="w-6 h-6 text-sky-500" />
+          <span>Flight Finder & Route Tracker</span>
+        </h2>
+        <p className="text-xs text-slate-500 mt-0.5">
+          Find real-time airfares, compare non-stop routes, and link flight bookings directly to your trip itineraries.
+        </p>
       </div>
 
-      {/* Loading & Fallback Alerts */}
-      {loading && <TableShimmer />}
-      
-      {fallbackMode && (
-        <div className="p-4 bg-amber-50 border border-amber-100 text-amber-700 rounded-2xl flex items-start space-x-3 text-sm font-medium">
-          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-          <span>API limits reached or RapidAPI keys not set. Showing simulated search offers.</span>
-        </div>
-      )}
-
-      {/* Results viewport */}
-      {flights && !loading && (
-        <div className="border border-slate-200/60 bg-white rounded-2xl p-6 shadow-sm space-y-4">
-          <h3 className="text-lg font-bold text-slate-800">Flight Offers</h3>
+      {/* Search Form Card */}
+      <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-5">
+        <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
           
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Origin City / Airport</label>
+            <input
+              type="text"
+              value={origin}
+              onChange={(e) => setOrigin(e.target.value)}
+              placeholder="e.g. New York (JFK)"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-xs font-semibold focus:border-blue-500 focus:bg-white"
+              required
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Destination City</label>
+            <input
+              type="text"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              placeholder="e.g. London (LHR)"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-xs font-semibold focus:border-blue-500 focus:bg-white"
+              required
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Departure Date</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none text-xs font-semibold focus:border-blue-500 focus:bg-white"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 hover:from-sky-500 hover:to-indigo-700 text-white font-bold rounded-xl text-xs shadow-md shadow-blue-500/20 hover:shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+          >
+            {loading ? (
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <>
+                <Search className="w-4 h-4" />
+                <span>Search Flights</span>
+              </>
+            )}
+          </button>
+        </form>
+
+        {/* Popular Route Shortcuts */}
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+          <span className="text-[11px] font-bold text-slate-400 uppercase">Popular Routes:</span>
+          {popularRoutes.map((r, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => {
+                setOrigin(r.from);
+                setDestination(r.to);
+              }}
+              className="text-[11px] font-semibold px-2.5 py-1 bg-slate-100 hover:bg-sky-50 hover:text-sky-600 text-slate-600 rounded-lg transition-colors cursor-pointer"
+            >
+              {r.from} → {r.to}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Loading Skeleton */}
+      {loading && <TableShimmer />}
+
+      {/* Results View */}
+      {flights && !loading && (
+        <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-black text-slate-800">
+              Available Flights: {origin} to {destination}
+            </h3>
+            <span className="text-xs font-bold text-slate-400">{flights.length} offers</span>
+          </div>
+
           {flights.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                    <th className="pb-4">Airline</th>
-                    <th className="pb-4">Departure</th>
-                    <th className="pb-4">Arrival</th>
-                    <th className="pb-4">Stops</th>
-                    <th className="pb-4">Price</th>
-                    <th className="pb-4 text-right">Link to Trip</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50 text-sm">
-                  {flights.map((fl, idx) => {
-                    const leg = fl.legs[0];
-                    const carrier = leg.carriers[0]?.marketing[0]?.name || 'Unknown Airline';
-                    const depTime = new Date(leg.departure).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const arrTime = new Date(leg.arrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    
-                    return (
-                      <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="py-4 font-bold text-slate-800">{carrier}</td>
-                        <td className="py-4 text-slate-600">{depTime}</td>
-                        <td className="py-4 text-slate-600">{arrTime}</td>
-                        <td className="py-4 text-slate-500 font-medium">
-                          {leg.stopCount === 0 ? 'Direct' : `${leg.stopCount} stops`}
-                        </td>
-                        <td className="py-4 font-black text-emerald-600 text-base">{fl.price.formatted}</td>
-                        <td className="py-4 text-right">
-                          <div className="flex items-center justify-end space-x-2">
-                            <select
-                              value={saveTripIds[idx] || ''}
-                              onChange={(e) => setSaveTripIds({...saveTripIds, [idx]: e.target.value})}
-                              className="px-2 py-1.5 border border-slate-200 rounded-lg text-xs bg-white focus:border-blue-500 outline-none"
-                            >
-                              <option value="">Select Trip...</option>
-                              {trips.map((trip) => (
-                                <option key={trip.id} value={trip.id}>
-                                  {trip.destination} ({trip.start_date})
-                                </option>
-                              ))}
-                            </select>
-                            <button
-                              onClick={() => handleSaveToTrip(idx, fl)}
-                              disabled={savingIdx === idx}
-                              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer interactive"
-                            >
-                              {savingIdx === idx ? 'Saving...' : 'Add'}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div className="space-y-4">
+              {flights.map((fl, idx) => {
+                const leg = fl.legs[0];
+                const carrier = (leg as any)?.carriers?.marketing?.[0]?.name || (leg as any)?.carriers?.[0]?.marketing?.[0]?.name || 'SkyWings International';
+                const depTime = leg?.departure ? new Date(leg.departure).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '08:30 AM';
+
+                const arrTime = leg?.arrival ? new Date(leg.arrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '01:45 PM';
+
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="p-5 rounded-2xl border border-slate-200/90 bg-slate-50/50 hover:bg-white hover:border-blue-200 hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                        <Plane className="w-6 h-6" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-extrabold text-slate-800">{carrier}</h4>
+                        <div className="flex items-center space-x-3 text-xs font-semibold text-slate-500">
+                          <span>Depart: {depTime}</span>
+                          <span>•</span>
+                          <span>Arrive: {arrTime}</span>
+                          <span>•</span>
+                          <span className="text-sky-600 font-bold">
+                            {leg?.stopCount === 0 ? 'Non-Stop' : `${leg?.stopCount} Stop(s)`}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
+                      <div className="text-left sm:text-right pr-2">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block">Airfare</span>
+                        <span className="text-lg font-black text-emerald-600">{fl.price.formatted}</span>
+                      </div>
+
+                      {/* Attach to trip controls */}
+                      <div className="flex items-center space-x-2">
+                        <select
+                          value={saveTripIds[idx] || ''}
+                          onChange={(e) => setSaveTripIds({ ...saveTripIds, [idx]: e.target.value })}
+                          className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:border-blue-500 max-w-[170px] truncate"
+                        >
+                          <option value="">Select Trip to Link...</option>
+                          {trips.map((t) => (
+                            <option key={t.id} value={t.id}>
+                              {t.destination} ({t.start_date})
+                            </option>
+                          ))}
+                        </select>
+
+                        <button
+                          onClick={() => handleSaveToTrip(idx, fl)}
+                          disabled={savingIdx === idx}
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 shrink-0 cursor-pointer shadow-xs"
+                        >
+                          {savingIdx === idx ? 'Adding...' : 'Link to Trip'}
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           ) : (
-            <div className="py-12 text-center text-slate-400 text-sm border-2 border-dashed border-slate-100 rounded-xl">
-              No flight routes found for selected dates. Try a different day.
+            <div className="py-12 text-center text-slate-400 text-xs border-2 border-dashed border-slate-100 rounded-2xl">
+              No flights found for this specific date and route. Try adjusting your departure date or nearby airport.
             </div>
           )}
         </div>

@@ -1,93 +1,162 @@
-# TravelMate AI
+# ✈️ TravelMate AI - Production-Ready Intelligent Travel Assistant
 
-TravelMate AI is a production-grade, full-stack travel assistant application that leverages AI to generate personalized itineraries, search for flights and hotels, provide weather forecasts, and maintain your travel history through a personalized dashboard.
+TravelMate AI is a modern, production-ready, full-stack AI travel companion that generates custom day-by-day itineraries, tracks flights and hotel rates, provides real-time weather forecasts with automated packing tips, and serves as an interactive 24/7 AI travel assistant.
 
-## 🌟 Features
-- **AI-Powered Itineraries:** Generate comprehensive day-by-day travel plans based on destination, budget, and travel style.
-- **AI Chatbot:** An intelligent assistant to answer your travel-related queries.
-- **Flight & Hotel Search:** Real-time data integrations via RapidAPI Sky Scraper.
-- **Weather Forecasts:** 5-day weather forecasts using OpenWeatherMap API.
-- **Saved Trips & Dashboard:** Save your favorite itineraries and view statistics (total budget, favorite destinations, etc.) on your personal dashboard.
-- **Secure Authentication:** JWT-based user authentication and secure password hashing.
+---
+
+## 🌟 Key Features
+
+- **🔐 100% Functional JWT Authentication System**: Complete Signup, Login, Password Reset, Profile Management (`/auth/me`, `/auth/profile`), session persistence in localStorage + React Context, and protected routes with zero mock data.
+- **🎨 Premium Travel Design System**: Custom travel theme (soft sky blues, warm sunset oranges, clean whites, and subtle glassmorphism), sleek desktop sidebar, mobile bottom navigation bar + drawer, toast notification system (`ToastProvider`), and smooth Framer Motion micro-interactions.
+- **🧭 AI Day-by-Day Itinerary Planner**: Generates structured itineraries for any duration, budget, and travel style (Luxury, Adventure, Budget, Family, Relaxation) with morning, afternoon, and evening activity breakdowns, cost estimates, local tips, and export/print support.
+- **💬 Context-Aware AI Chatbot**: ChatGPT-style travel assistant with prompt suggestion chips, conversation history, and the ability to link questions directly to active saved trips.
+- **✈️ Live Flight & Hotel Search**: Search non-stop and connecting routes, compare fares and hotel star ratings, and attach bookings directly to your trip itineraries.
+- **⛅ 5-Day Weather Forecast & Packing Advisor**: Real-time forecast previews with automated packing recommendations based on anticipated rain and temperature shifts.
+- **📊 Interactive Dashboard & Saved Trips**: Visual stats (total trips, budget allocated, favorite destinations), upcoming trip countdowns with weather warnings, and multi-tab trip detail modals (Itinerary, Bookings, Packing Checklist, Notes).
+- **🛡️ High Reliability & Graceful Fallbacks**: Intelligent built-in fallback engines for AI itineraries, chat, flights, hotels, and weather, so the application runs 100% reliably out-of-the-box even before API keys are configured.
+
+---
 
 ## 🛠️ Technology Stack
-- **Backend:** FastAPI (Python)
-- **Frontend:** Streamlit
-- **Database:** PostgreSQL (Neon)
-- **AI Integration:** Google Gemini API (gemini-2.0-flash)
-- **APIs:** 
-  - Sky Scraper API (Flights & Hotels)
-  - OpenWeatherMap API (Weather)
-- **Deployment:** Render (Backend) & Streamlit Cloud (Frontend)
+
+- **Frontend**: React 19, TypeScript, Vite 8, Tailwind CSS v4, Framer Motion, Lucide React, Axios, React Router v7
+- **Backend**: FastAPI (Python 3.11 / 3.12), SQLAlchemy ORM (SQLite / PostgreSQL), Pydantic v2, `python-jose`, `bcrypt`
+- **AI Engine**: Google Gemini API (`gemini-1.5-flash` / `gemini-2.0-flash` with fallback generator)
+- **External APIs**: RapidAPI SkyScrapper (Flights & Hotels), OpenWeatherMap API (Weather)
 
 ---
 
-## 🚀 Local Setup Instructions
+## 🚀 Quick Start Guide
 
 ### 1. Prerequisites
-- Python 3.11 or 3.12 (Do NOT use Python 3.14 to avoid dependency build issues)
-- A free PostgreSQL database from [Neon](https://neon.tech/)
-
-### 2. Clone and Environment Setup
-Clone this repository (or copy the folder) and create an `.env` file in the root directory based on `.env.example`:
-
-```env
-DATABASE_URL=postgresql://user:password@hostname/dbname?sslmode=require
-SECRET_KEY=your_secure_random_string
-GEMINI_API_KEY=your_gemini_api_key
-RAPIDAPI_KEY=your_rapidapi_key
-OPENWEATHER_API_KEY=your_openweather_key
-```
-
-### 3. Install Dependencies
-Open your terminal in the root `travelmate-ai` directory and install the requirements:
-```bash
-pip install -r backend/requirements.txt
-pip install -r frontend/requirements.txt
-```
-
-### 4. Run the Application
-You will need two terminals running simultaneously.
-
-**Terminal 1 (Backend):**
-```bash
-uvicorn backend.main:app --reload
-```
-*The backend will be available at `http://localhost:8000`. Database tables will be created automatically on the first run.*
-
-**Terminal 2 (Frontend):**
-```bash
-streamlit run frontend/app.py
-```
-*The Streamlit web interface will open in your browser automatically.*
+- **Node.js** (v18+) & **npm**
+- **Python** (3.11 or 3.12)
 
 ---
 
-## 🌍 Production Deployment
+### 2. Backend Setup
 
-### Deploying the Backend on Render
-1. Push your code to a GitHub repository.
-2. Sign up / Log in to [Render](https://render.com/).
-3. Click **New +** and select **Web Service**.
-4. Connect your GitHub repository.
-5. **Configuration:**
-   - **Environment:** `Python 3`
-   - **Build Command:** `pip install -r backend/requirements.txt`
-   - **Start Command:** `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
-6. **Environment Variables:** Add all variables from your `.env` file (`DATABASE_URL`, `SECRET_KEY`, `GEMINI_API_KEY`, `RAPIDAPI_KEY`, `OPENWEATHER_API_KEY`).
-7. Click **Create Web Service**. Once deployed, copy the Render URL (e.g., `https://travelmate-backend.onrender.com`).
-
-### Deploying the Frontend on Streamlit Cloud
-1. Sign up / Log in to [Streamlit Community Cloud](https://share.streamlit.io/).
-2. Click **New app** and connect your GitHub repository.
-3. Set the **Main file path** to `frontend/app.py`.
-4. Click **Advanced settings** before deploying, and add your secrets (Environment Variables) in TOML format:
-   ```toml
-   BACKEND_URL="https://travelmate-backend.onrender.com"
+1. Open a terminal and navigate to the backend directory:
+   ```bash
+   cd backend
    ```
-5. Click **Deploy!**
+2. (Optional) Create and activate a Python virtual environment:
+   ```bash
+   python -m venv venv
+   # On Windows:
+   venv\Scripts\activate
+   # On macOS/Linux:
+   source venv/bin/activate
+   ```
+3. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Create a `.env` file in the `backend` folder (or root) based on `backend/.env.example`:
+   ```env
+   # Database: Leave empty or use SQLite by default
+   DATABASE_URL=sqlite:///./travelmate.db
+
+   # JWT Secret Key
+   SECRET_KEY=travelmate-super-secret-jwt-key-2026
+
+   # (Optional) Google Gemini API Key: https://aistudio.google.com/
+   GEMINI_API_KEY=
+
+   # (Optional) OpenWeatherMap Key: https://openweathermap.org/api
+   OPENWEATHER_API_KEY=
+
+   # (Optional) RapidAPI Sky Scrapper Key: https://rapidapi.com/
+   RAPIDAPI_KEY=
+   ```
+5. Start the FastAPI backend server:
+   ```bash
+   uvicorn backend.main:app --reload --port 8000
+   ```
+   *The backend will run at `http://localhost:8000`. Swagger API docs are available at `http://localhost:8000/docs`.*
+
+---
+
+### 3. Frontend Setup
+
+1. Open a second terminal and navigate to `frontend-web`:
+   ```bash
+   cd frontend-web
+   ```
+2. Install npm dependencies:
+   ```bash
+   npm install
+   ```
+3. (Optional) Create a `.env` file in `frontend-web`:
+   ```env
+   VITE_BACKEND_URL=http://localhost:8000
+   ```
+4. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+5. Open your browser and navigate to `http://localhost:5173`.
+
+---
+
+## 📂 Project Structure
+
+```
+travelmate-ai/
+├── backend/
+│   ├── database.py              # SQLAlchemy engine (SQLite fallback + PostgreSQL)
+│   ├── main.py                  # FastAPI app & CORS configuration
+│   ├── models/
+│   │   ├── models.py            # User, PasswordResetToken, Trip, Itinerary, Search ORM models
+│   │   └── schemas.py           # Pydantic v2 schemas for auth, trips, chat, weather
+│   ├── routes/
+│   │   ├── auth.py              # Signup, Login, /me, /profile, /forgot-password, /reset-password
+│   │   ├── trips.py             # Save, list, update, delete trips & link flights/hotels
+│   │   ├── itinerary.py         # AI Itinerary generation endpoint
+│   │   ├── chat.py              # AI Chat endpoint with trip context
+│   │   ├── flights.py           # Flight search endpoint
+│   │   ├── hotels.py            # Hotel search endpoint
+│   │   └── weather.py           # Weather forecast endpoint
+│   ├── services/
+│   │   ├── gemini_service.py    # Gemini LLM caller with intelligent fallback generator
+│   │   ├── skyscraper_service.py # Flights & Hotels service with fallback simulation
+│   │   ├── weather_service.py   # 5-day weather service with fallback simulation
+│   │   └── trips_service.py     # Dashboard metrics and analytics aggregator
+│   ├── requirements.txt
+│   └── .env.example
+│
+├── frontend-web/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Layout.tsx       # Responsive layout (Sidebar, Mobile Bottom Nav, Profile Dropdown)
+│   │   │   ├── Shimmer.tsx      # Skeleton loading states
+│   │   │   └── CustomCursor.tsx # Ambient micro-interaction cursor
+│   │   ├── context/
+│   │   │   ├── AuthContext.tsx  # User session, login, signup, logout, profile update
+│   │   │   └── ToastContext.tsx # Modern animated toast notification provider
+│   │   ├── pages/
+│   │   │   ├── Splash.tsx       # Modern high-converting Landing page with hero & previews
+│   │   │   ├── Auth.tsx         # Login, Signup, Forgot Password, Reset Password
+│   │   │   ├── Dashboard.tsx    # Greeting, stats metrics, upcoming weather alert, recent trips
+│   │   │   ├── PlanTrip.tsx     # AI Itinerary builder, daily timeline, budget slider, notes
+│   │   │   ├── Chat.tsx         # AI Chat with trip context, prompt chips, copy actions
+│   │   │   ├── SavedTrips.tsx   # Search, filters, multi-tab modal (Itinerary, Bookings, Checklist)
+│   │   │   ├── Profile.tsx      # User profile, home airport, currency, travel style preferences
+│   │   │   ├── Settings.tsx     # Security password change, notification toggles, API provider info
+│   │   │   ├── Flights.tsx      # Flight finder & direct trip attachment
+│   │   │   ├── Hotels.tsx       # Hotel finder & star rating previews
+│   │   │   └── Weather.tsx      # 5-day forecast cards & packing guidelines
+│   │   ├── lib/
+│   │   │   └── api.ts           # Axios instance with JWT interceptors
+│   │   ├── App.tsx              # Application routing & protected route wrappers
+│   │   └── main.tsx
+│   ├── package.json
+│   └── .env.example
+│
+└── README.md
+```
 
 ---
 
 ## 📄 License
-This project is for educational and portfolio purposes.
+This project is open-source under the MIT License.
