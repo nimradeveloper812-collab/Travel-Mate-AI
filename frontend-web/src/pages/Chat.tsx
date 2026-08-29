@@ -266,13 +266,17 @@ export default function Chat() {
             <div className="w-8 h-8 rounded-xl bg-sky-100 text-blue-600 flex items-center justify-center shrink-0">
               <Bot className="w-4 h-4" />
             </div>
-            <div className="p-4 rounded-2xl rounded-tl-none bg-slate-50 border border-slate-200/80 flex items-center space-x-1.5">
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce delay-100" />
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce delay-200" />
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce delay-300" />
+            <div className="p-3.5 px-4 rounded-2xl rounded-tl-none bg-slate-50 border border-slate-200/80 flex items-center space-x-2.5">
+              <div className="flex items-center space-x-1">
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
+              <span className="text-[11px] font-bold text-slate-400">Thinking...</span>
             </div>
           </div>
         )}
+
 
         <div ref={chatEndRef} />
       </div>

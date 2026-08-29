@@ -18,6 +18,10 @@ if GEMINI_API_KEY:
     except Exception as e:
         print(f"Warning: Failed to configure Google Generative AI: {e}")
 
+# Global cached model instances for low latency
+_cached_chat_model = None
+_cached_itinerary_model = None
+
 def _clean_json(text: str) -> str:
     """Strip markdown code fences from Gemini JSON output."""
     text = text.strip()
@@ -26,16 +30,22 @@ def _clean_json(text: str) -> str:
     return text.strip()
 
 def _get_gemini_model():
+    global _cached_chat_model
+    if _cached_chat_model:
+        return _cached_chat_model
     if not _gemini_client_available:
         return None
     import google.generativeai as genai
-    # Use active Gemini 3.6 / latest models
-    for model_name in ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-flash-latest', 'gemini-pro-latest']:
+    # Prioritize gemini-3.5-flash-lite (ultra-fast low latency) then 3.6-flash
+    for model_name in ['gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-3.7-flash']:
         try:
-            return genai.GenerativeModel(model_name)
+            m = genai.GenerativeModel(model_name)
+            _cached_chat_model = m
+            return m
         except Exception:
             continue
     return None
+
 
 
 def _generate_fallback_itinerary(destination: str, days: int, budget: float, travel_style: str) -> str:
@@ -195,13 +205,17 @@ Requirements:
 """
 
     try:
-        response = model.generate_content(prompt)
+        response = model.generate_content(
+            prompt,
+            generation_config={"temperature": 0.2, "max_output_tokens": 1500}
+        )
         text = _clean_json(response.text)
         json.loads(text)  # Validate JSON parse
         return text
     except Exception as e:
         print(f"Gemini API generation error ({e}), falling back to intelligent travel engine.")
         return _generate_fallback_itinerary(destination, days, budget, travel_style)
+
 
 def _generate_fallback_chat(message: str, trip_context: str = "") -> str:
     """Intelligent, multi-category realistic travel knowledge engine."""
@@ -325,10 +339,14 @@ def chat_with_ai(message: str, history: list, trip_context: str = "") -> str:
     try:
         chat = model.start_chat(history=chat_history)
         full_message = f"{system_prompt}\n\nUser Question: {message}"
-        response = chat.send_message(full_message)
+        response = chat.send_message(
+            full_message,
+            generation_config={"temperature": 0.3, "max_output_tokens": 600}
+        )
         return response.text
     except Exception as e:
         print(f"Gemini chat error ({e}), utilizing intelligent assistant fallback.")
         return _generate_fallback_chat(message, trip_context)
+
 
 
