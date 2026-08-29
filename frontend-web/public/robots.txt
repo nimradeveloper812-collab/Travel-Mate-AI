@@ -1,0 +1,16 @@
+# Google Search Console Robots.txt
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /signup
+Allow: /plan-trip
+Allow: /weather
+Allow: /hotels
+
+# Disallow private user data directories
+Disallow: /api/
+Disallow: /settings
+Disallow: /profile
+
+# Sitemap location
+Sitemap: https://travelmate-ai.onrender.com/sitemap.xml

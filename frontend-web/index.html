@@ -1,13 +1,70 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-full">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    <!-- Primary Mobile & Viewport Optimization (Google Search Console Mobile-Friendly Standard) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="theme-color" content="#0284c7" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="TravelMate AI" />
+
+    <!-- SEO Meta Tags -->
+    <title>TravelMate AI - Intelligent AI Travel Planner & Journey Assistant</title>
+    <meta name="description" content="Plan your perfect trip with TravelMate AI. Generate personalized day-by-day itineraries, smart budget breakdowns, live weather forecasts, and 24/7 AI travel guidance." />
+    <meta name="keywords" content="AI travel planner, trip planner, travel assistant, vacation itinerary, budget calculator, packing guide, travel weather, journey copilot" />
+    <meta name="author" content="TravelMate AI Team" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+    <!-- Open Graph (OG) Social Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TravelMate AI" />
+    <meta property="og:title" content="TravelMate AI - Intelligent AI Travel Planner & Journey Assistant" />
+    <meta property="og:description" content="Personalized day-by-day itineraries, smart budgets, hotel recommendations, and live weather packing insights." />
+    <meta property="og:image" content="/favicon.svg" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TravelMate AI - Smart Journey Copilot" />
+    <meta name="twitter:description" content="Instant AI-powered travel itineraries, budget estimators, and destination insights." />
+    <meta name="twitter:image" content="/favicon.svg" />
+
+    <!-- Favicon & Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend-web</title>
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Google Structured Data (JSON-LD Schema for Google Search Console) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "TravelMate AI",
+        "url": "https://travelmate-ai.onrender.com",
+        "applicationCategory": "TravelApplication",
+        "operatingSystem": "All",
+        "description": "Intelligent AI travel companion for custom day-by-day itineraries, budgeting, weather forecasts, and 24/7 destination advice.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "AI Day-by-Day Itinerary Generation",
+          "Realistic Travel Budget Breakdown",
+          "5-Day Weather Forecast & Automated Packing Advice",
+          "Hotel Discovery & Trip Booking Organizer",
+          "24/7 Specialized AI Travel Assistant"
+        ]
+      }
+    </script>
   </head>
-  <body>
-    <div id="root"></div>
+  <body class="h-full bg-slate-50 text-slate-900 antialiased overflow-x-hidden">
+    <div id="root" class="min-h-full flex flex-col"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
