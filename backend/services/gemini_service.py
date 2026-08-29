@@ -38,59 +38,122 @@ def _get_gemini_model():
     return None
 
 def _generate_fallback_itinerary(destination: str, days: int, budget: float, travel_style: str) -> str:
-    """Generates a rich, highly tailored fallback itinerary if external LLM is offline."""
-    daily_budget = round(budget / max(days, 1), 2)
-    activities_by_style = {
-        "Luxury": [
-            ("Private VIP historical walking tour & landmark visit", "Fine dining lunch at Michelin-starred bistro", "Sunset yacht harbor cruise & rooftop champagne lounge"),
+    """Generates a rich, realistic itinerary with dynamic daily cost distributions and budget feasibility checks."""
+    days = max(1, min(days, 30))
+    avg_daily = budget / days
+
+    # Budget reality checks & style adaptation
+    is_tight_budget = (travel_style == "Luxury" and avg_daily < 120) or (avg_daily < 40)
+    
+    # Define varied activity sets
+    if is_tight_budget:
+        activities_pool = [
+            ("Free walking tour of historic Old Town & local street market", "Scenic public beach relaxation & picnic with local deli treats", "Panoramic sunset from city viewpoint & affordable night bazaar"),
+            ("Self-guided architectural walk & public museum free-entry hours", "Lunch at popular neighborhood street vendor & botanical park stroll", "Evening stroll along lighted waterfront promenade & artisan gelato"),
+            ("Local bus excursion to nearby scenic nature trail & temple grounds", "Casual cafe lunch & independent craft market browsing", "Open-air community music performance & street food dinner"),
+            ("Morning swim/hike at local nature reserve & photo session", "Afternoon cultural center visit & historic alleyways", "Sunset harbor walk & local night food court exploration"),
+            ("Bicycle rental along scenic greenway & heritage quarter", "Local farm food stall lunch & souvenir bargaining", "Cozy evening at local acoustic tea/coffee lounge")
+        ]
+    elif travel_style == "Luxury":
+        activities_pool = [
+            ("Private VIP historical walking tour & landmark skip-the-line visit", "Fine dining lunch at renowned waterfront bistro", "Sunset yacht harbor cruise & rooftop champagne lounge"),
             ("Chauffeured scenic excursion to iconic cultural quarter", "Exclusive boutique shopping & bespoke afternoon tea", "Private chef tasting menu & opera/theatre performance"),
-            ("Helicopter panoramic city flight & scenic vistas", "Luxury thermal spa & wellness retreat afternoon", "Gourmet waterfront dinner with wine pairing"),
-        ],
-        "Adventure": [
-            ("Sunrise mountain ridge hike & panoramic lookout", "Whitewater kayaking / off-road trail expedition", "Campfire cookout or vibrant night street food crawl"),
-            ("Rock climbing / coastal cave exploration", "Mountain biking through historic countryside paths", "Local craft brewery tour & live folk music gathering"),
-            ("Wilderness trek & hidden waterfall discovery", "Zipline canopy adventure across scenic valley", "Stargazing observatory visit & local tavern dinner"),
-        ],
-        "Budget": [
-            ("Self-guided historic old town walking route", "Local central market exploration & authentic street food lunch", "Free sunset viewpoint at panoramic public park & lively piazza"),
-            ("Free museum morning & public art district walk", "Picnic in botanical gardens with artisanal local snacks", "Night market browsing & local social gathering spot"),
-            ("Coastal boardwalk stroll or heritage architecture trail", "Community food hall lunch with regional specialties", "Public square open-air music & cultural center event"),
-        ],
-        "Family": [
+            ("Helicopter / panoramic scenic flight over coastal highlights", "Luxury spa wellness treatment & infinity pool cabana", "Gourmet Michelin-curated dinner with sommelier wine pairing"),
+            ("Private boat charter to secluded coves & snorkeling reefs", "Artisan gourmet lunch & private art collection viewing", "Seaside candlelit dinner with live private jazz quartet"),
+            ("Exclusive guided sunrise tour of heritage monuments", "High-end shopping in luxury fashion district & gourmet lunch", "Celebratory rooftop dining with panoramic skyline night views")
+        ]
+    elif travel_style == "Adventure":
+        activities_pool = [
+            ("Guided mountain ridge trek & sunrise lookout climb", "Wilderness river kayaking & scenic riverside picnic", "Campfire barbecue under the stars & stargazing session"),
+            ("Off-road 4x4 safari expedition to remote waterfall gorges", "Canyoning or rock climbing with certified mountain guides", "Hearty regional tavern dinner & local craft brew tasting"),
+            ("Coastal cliff trail exploration & hidden sea cave swim", "Mountain bike descent through alpine forests", "Sunset beach bonfire with fresh grilled seafood"),
+            ("Whitewater rafting adventure through scenic river canyon", "Trailside picnic & wildlife observation hike", "Rustic mountain lodge dinner & storytelling by the hearth"),
+            ("Scuba diving / reef exploration at protected marine reserve", "Afternoon coastal zipline course & jungle canopy walk", "Lively local harbor pub with traditional music")
+        ]
+    elif travel_style == "Family":
+        activities_pool = [
             ("Interactive science & history discovery museum", "Family-friendly waterfront park & paddleboat rental", "Themed family dinner & evening boardwalk illumination stroll"),
             ("Local zoo or world-class aquarium excursion", "Hands-on cooking class for traditional regional dishes", "Outdoor cinema or evening puppet / illusionist show"),
             ("Botanical gardens miniature train & butterfly pavilion", "Beach picnic and sandcastle / kayak activities", "Artisan gelato tasting & souvenir craft shopping"),
-        ],
-        "Relaxation": [
+            ("Theme park or adventure ropes course for all ages", "Casual family lunch at open-air cafe & playground visit", "Evening beach stroll and stargazing"),
+            ("Hands-on ceramic craft workshop & local landmark tour", "Picnic lunch in scenic public gardens with duck pond", "Family pizza-making night & board games")
+        ]
+    else:  # Relaxation
+        activities_pool = [
             ("Morning mindful stroll through tranquil botanical gardens", "Thermal hot springs & organic aromatherapy spa treatment", "Seaside promenade sunset walk & candlelit seaside dinner"),
             ("Peaceful tea garden ceremony & historic temple courtyard", "Leisurely brunch followed by private cabana relaxation", "Gentle sunset yoga session & organic farm-to-table dinner"),
             ("Scenic coastal cliff walk & ocean view meditation", "Art gallery immersion & calm reading at heritage bookstore cafe", "Acoustic jazz evening with fine herbal infusions"),
+            ("Private beach day with sun lounger & refreshing smoothie bar", "Hydrotherapy pool & soothing full-body massage", "Romantic sunset dinner with soothing ocean waves"),
+            ("Sunrise meditation by the water & quiet breakfast buffet", "Botanical conservatory walk & peaceful afternoon siesta", "Calm harbor catamaran cruise with light refreshments")
         ]
-    }
 
-    style_plans = activities_by_style.get(travel_style, activities_by_style["Luxury"])
-    
+    # Generate realistic variable daily budgets that sum up to total budget
+    weight_multipliers = []
+    for d in range(1, days + 1):
+        if d == 1:
+            weight = 0.7  # Arrival day (settling in)
+        elif d == days and days > 1:
+            weight = 0.6  # Departure day
+        elif d % 3 == 0:
+            weight = 1.3  # Big excursion day
+        elif d % 2 == 0:
+            weight = 1.1  # Active day
+        else:
+            weight = 0.9  # Standard leisure day
+        weight_multipliers.append(weight)
+
+    total_weight = sum(weight_multipliers)
     daily_plans = []
+    current_spent = 0.0
+
+    day_titles = [
+        "Arrival, Settling In & First Impressions",
+        "Iconic Landmarks & Historic Quarter",
+        "Scenic Nature, Waterways & Hidden Gems",
+        "Culinary Exploration & Local Culture",
+        "Adventure Excursion & Panoramic Lookouts",
+        "Arts, Architecture & Craft Markets",
+        "Coastal Breezes & Waterfront Leisure",
+        "Historic Day-Trip & Heritage Discoveries",
+        "Thermal Wellness & Afternoon Relaxation",
+        "Local Traditions & Neighborhood Immersion",
+        "Island Hopping & Scenic Lookouts",
+        "Botanical Wonders & Serene Escapes",
+        "Shopping, Souvenirs & Hidden Cafes",
+        "Celebratory Sunset Experiences",
+        "Final Morning Memories & Departure"
+    ]
+
     for day in range(1, days + 1):
-        idx = (day - 1) % len(style_plans)
-        morning_act, afternoon_act, evening_act = style_plans[idx]
+        idx = (day - 1) % len(activities_pool)
+        morning_act, afternoon_act, evening_act = activities_pool[idx]
+        title_idx = (day - 1) % len(day_titles)
         
+        # Calculate variable cost
+        if day == days:
+            day_cost = round(max(5.0, budget - current_spent), 2)
+        else:
+            day_cost = round((weight_multipliers[day - 1] / total_weight) * budget, 2)
+            current_spent += day_cost
+
         daily_plans.append({
             "day": day,
-            "title": f"Day {day}: Exploring the Essence of {destination}",
+            "title": f"Day {day}: {day_titles[title_idx]}",
             "morning": f"Start your morning with {morning_act} in {destination}.",
             "afternoon": f"Spend the afternoon with {afternoon_act}.",
             "evening": f"Conclude your evening with {evening_act}.",
-            "estimated_cost": daily_budget
+            "estimated_cost": day_cost
         })
 
     travel_tips = [
-        f"Download offline transit maps for {destination} and keep local currency on hand.",
-        f"Book top landmarks in {destination} 3-5 days ahead to bypass queues.",
-        f"Try authentic local regional delicacies and ask resident shopkeepers for their favorite hidden gems.",
-        f"Pack comfortable walking shoes and weather-appropriate layers for outdoor activities.",
-        f"Always check local public transport passes for discounted multi-day travel."
+        f"Download offline transit maps for {destination} and keep small local currency bills on hand.",
+        f"Book top landmarks and cultural sites in {destination} 3-5 days in advance to secure tickets.",
+        f"Try authentic local regional eateries and ask resident shopkeepers for their favorite hidden dining spots.",
+        f"Pack comfortable walking shoes and weather-appropriate layers for varied outdoor climates."
     ]
+
+    if is_tight_budget:
+        travel_tips.insert(0, f"💡 Budget Advisory: An average of ${avg_daily:.1f}/day is a strict budget for {destination}. We tailored activities around self-guided exploration, free landmarks, and local street food to maximize your experience without overspending.")
 
     return json.dumps({
         "destination": destination,
@@ -105,9 +168,13 @@ def generate_itinerary(destination: str, days: int, budget: float, travel_style:
     if not model:
         return _generate_fallback_itinerary(destination, days, budget, travel_style)
 
-    prompt = f"""Create a detailed {days}-day travel itinerary for {destination}.
-Budget: ${budget} USD. Travel style: {travel_style}.
-Return ONLY valid JSON in this exact format (no markdown, no backticks, no extra text):
+    prompt = f"""Create a realistic, detailed {days}-day travel itinerary for {destination}.
+Total Budget: ${budget} USD. Travel style: {travel_style}.
+
+Requirements:
+1. Distribute daily costs realistically so each day has a realistic varied cost (not equal splits) and the sum equals ${budget}.
+2. If the budget is low for {days} days (${budget/days:.1f}/day), realistically adapt the activities (e.g. scenic viewpoints, free cultural sites, street food, public transport) instead of unrealistic luxury claims, and add an honest budget advisory tip.
+3. Return ONLY valid JSON in this exact structure (no markdown fences, no extra text):
 {{
   "destination": "{destination}",
   "total_days": {days},
@@ -118,13 +185,14 @@ Return ONLY valid JSON in this exact format (no markdown, no backticks, no extra
       "morning": "Morning activity description",
       "afternoon": "Afternoon activity description",
       "evening": "Evening activity description",
-      "estimated_cost": 150
+      "estimated_cost": 45.0
     }}
   ],
   "total_estimated_cost": {budget},
-  "travel_tips": ["Tip 1", "Tip 2", "Tip 3", "Tip 4"]
+  "travel_tips": ["Tip 1", "Tip 2", "Tip 3"]
 }}
 """
+
     try:
         response = model.generate_content(prompt)
         text = _clean_json(response.text)
