@@ -4,13 +4,13 @@ import { motion } from 'framer-motion';
 import {
   Compass,
   Sparkles,
-  Plane,
   CloudSun,
   ArrowRight,
   MapPin,
   CheckCircle2,
   ChevronRight
 } from 'lucide-react';
+
 
 import { useAuth } from '../context/AuthContext';
 
@@ -200,13 +200,14 @@ export default function Landing() {
 
             <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all hover:-translate-y-1 space-y-4 shadow-sm">
               <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center">
-                <Plane className="w-6 h-6" />
+                <Compass className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white">Flight & Hotel Matching</h3>
+              <h3 className="text-lg font-bold text-white">Hotel & Stays Discovery</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Search best routes, compare cabin fares and top-rated accommodations, and link them directly to your active trip with a single tap.
+                Discover vetted accommodations, star ratings, and neighborhood locations, and attach reservations directly to your active trips.
               </p>
             </div>
+
 
             <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all hover:-translate-y-1 space-y-4 shadow-sm">
               <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
