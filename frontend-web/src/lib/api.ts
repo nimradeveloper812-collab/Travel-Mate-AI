@@ -1,10 +1,14 @@
 import axios from 'axios';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+const rawUrl = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000').trim();
+const BACKEND_URL = rawUrl.replace(/\/+$/, '');
 
 const api = axios.create({
   baseURL: BACKEND_URL,
+  timeout: 45000, // 45s to allow Render free tier spin-up
 });
+
+
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');

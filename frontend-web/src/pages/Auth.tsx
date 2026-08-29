@@ -142,8 +142,9 @@ export default function Auth() {
         errorText = detail;
       } else if (err.code === 'ERR_NETWORK' || err.message === 'Network Error' || !err.response) {
         const currentBackend = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
-        errorText = `Cannot reach backend at ${currentBackend}. Make sure the Render backend is live and VITE_BACKEND_URL is set in Netlify.`;
+        errorText = `Cannot reach backend at ${currentBackend}. If the Render backend was inactive, it may take 30-45s to wake up on the free tier. Please check your backend service status on Render.`;
       }
+
       
       setErrorMessage(errorText);
       toastError(errorText, 'Authentication Notice');
