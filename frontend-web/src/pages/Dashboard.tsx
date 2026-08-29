@@ -9,10 +9,11 @@ import {
   ArrowRight,
   CloudSun,
   Sparkles,
-  Plane,
+  BookmarkCheck,
   Hotel,
   PlusCircle
 } from 'lucide-react';
+
 
 import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
@@ -253,10 +254,11 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { to: '/plan-trip', label: 'Plan Itinerary', icon: Compass, color: 'text-sky-500 bg-sky-50' },
-            { to: '/flights', label: 'Search Flights', icon: Plane, color: 'text-blue-500 bg-blue-50' },
+            { to: '/saved-trips', label: 'Saved Trips', icon: BookmarkCheck, color: 'text-blue-500 bg-blue-50' },
             { to: '/hotels', label: 'Find Hotels', icon: Hotel, color: 'text-indigo-500 bg-indigo-50' },
             { to: '/weather', label: 'Weather Forecast', icon: CloudSun, color: 'text-amber-500 bg-amber-50' },
           ].map((item, idx) => {
+
             const Icon = item.icon;
             return (
               <Link

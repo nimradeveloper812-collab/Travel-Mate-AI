@@ -7,8 +7,8 @@ import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import PlanTrip from './pages/PlanTrip';
 import Chat from './pages/Chat';
-import Flights from './pages/Flights';
 import Hotels from './pages/Hotels';
+
 import Weather from './pages/Weather';
 import SavedTrips from './pages/SavedTrips';
 import Profile from './pages/Profile';
@@ -95,15 +95,6 @@ export default function App() {
             />
 
             <Route
-              path="/flights"
-              element={
-                <ProtectedRoute>
-                  <Flights />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
               path="/hotels"
               element={
                 <ProtectedRoute>
@@ -111,6 +102,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+
 
             <Route
               path="/weather"

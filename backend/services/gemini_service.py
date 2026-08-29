@@ -29,13 +29,14 @@ def _get_gemini_model():
     if not _gemini_client_available:
         return None
     import google.generativeai as genai
-    # Attempt newer models first
-    for model_name in ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-pro']:
+    # Use active Gemini 3.6 / latest models
+    for model_name in ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-flash-latest', 'gemini-pro-latest']:
         try:
             return genai.GenerativeModel(model_name)
         except Exception:
             continue
     return None
+
 
 def _generate_fallback_itinerary(destination: str, days: int, budget: float, travel_style: str) -> str:
     """Generates a rich, realistic itinerary with dynamic daily cost distributions and budget feasibility checks."""
@@ -202,69 +203,115 @@ Requirements:
         print(f"Gemini API generation error ({e}), falling back to intelligent travel engine.")
         return _generate_fallback_itinerary(destination, days, budget, travel_style)
 
+def _generate_fallback_chat(message: str, trip_context: str = "") -> str:
+    """Intelligent, multi-category realistic travel knowledge engine."""
+    msg = message.lower().strip()
+
+    # 1. Non-travel off-topic guardrails (polite humble refusal)
+    non_travel_keywords = [
+        "code", "python", "javascript", "react", "html", "css", "java", "c++", "sql", "database",
+        "math", "calculus", "algebra", "homework", "exam", "physics", "chemistry", "biology",
+        "crypto", "bitcoin", "stock market", "trading", "politics", "election", "president",
+        "write essay", "write poem", "solve this", "debug"
+    ]
+    
+    if any(kw in msg for kw in non_travel_keywords):
+        return (
+            "🙏 **TravelMate AI Scope Notice**\n\n"
+            "Main aapka dedicated **TravelMate AI Assistant** hoon, aur meri specialization sirf **travel planning, destinations, trip budgets, hotels, flights, weather, aur packing advice** tak mehdood hai.\n\n"
+            "Main non-travel ya technical topics mein madad nahi kar sakta, lekin agar aap kisi bhi city, country, trip budget, ya vacation ke mutaliq sawal poochen to mujhe aapki rehnumai karne mein behad khushi hogi! 🌍✈️"
+        )
+
+    # 2. Dress & Clothing / Weather / Packing queries
+    if any(k in msg for k in ["dress", "cloth", "wear", "outfit", "pack", "shoe", "weather", "temperature", "rain", "winter", "summer", "season"]):
+        return (
+            "👗 **Realistic Travel Dressing & Weather Guide**\n\n"
+            "🌍 **Climate & Fabric Selection:**\n"
+            "• **Warm / Tropical (e.g. Bali, Thailand, Dubai):** Breathable natural fabrics (linen, lightweight cotton, rayon). Loose-fitting shirts, shorts, sunglasses, and UV protection hat.\n"
+            "• **Cold / Alpine (e.g. Switzerland, Northern Europe):** 3-layer system — thermal base layer, insulating fleece/wool mid-layer, and wind/waterproof outer jacket.\n"
+            "• **Cultural & Religious Sites (Temples/Mosques/Churches):** Respectful attire covering shoulders and knees. Carry a light scarf or sarong for quick modesty.\n\n"
+            "👟 **Footwear Essentials:**\n"
+            "• Broken-in cushioned walking sneakers (15,000+ daily steps).\n"
+            "• 1 pair of versatile evening casual shoes + breathable sandals/water shoes.\n\n"
+            "💡 *Pro-Tip: Check local 5-day weather forecasts 48 hours before flying to make final luggage adjustments!*"
+        )
+
+    # 3. Budget, Money, Costs & Expenses queries
+    if any(k in msg for k in ["budget", "cost", "money", "expensive", "cheap", "price", "how much", "dollar", "currency", "saving"]):
+        return (
+            "💰 **Realistic Trip Budgeting & Financial Blueprint**\n\n"
+            "📊 **Standard Daily Cost Tiers (Per Person):**\n"
+            "• **Backpacker / Budget:** $30 – $60 / day (Hostels, public transit/buses, local street eateries, free attractions).\n"
+            "• **Mid-Range / Comfort:** $100 – $220 / day (3-star boutique hotels, sit-down neighborhood bistros, paid museums, rideshares).\n"
+            "• **Luxury:** $350 – $700+ / day (5-star resorts, fine dining/Michelin spots, private guided tours, chauffeur transfers).\n\n"
+            "💡 **Smart Money-Saving Tactics:**\n"
+            "• Use credit cards with zero foreign transaction fees to avoid 3-4% bank markups.\n"
+            "• Purchase multi-day transit passes at airport rail terminals for up to 40% transport savings.\n"
+            "• Have a 15% emergency contingency fund for spontaneous excursions or currency fluctuations."
+        )
+
+    # 4. Flight & Transportation queries
+    if any(k in msg for k in ["flight", "ticket", "airline", "airport", "train", "transit", "metro", "bus", "taxi", "uber"]):
+        return (
+            "✈️ **Flight & Transport Strategy Guide**\n\n"
+            "📍 **Booking Timing:** Best airfare windows are 6–8 weeks in advance for domestic flights and 3–5 months for international routes.\n"
+            "📅 **Cheapest Travel Days:** Tuesday and Wednesday departures typically offer 15-20% lower fares compared to weekend flights.\n"
+            "🚇 **Local Transit:** Download local city transport apps (Citymapper, Google Maps offline) and purchase rechargeable smart cards at central stations.\n"
+            "🧳 **Luggage Strategy:** Ensure carry-on weight complies with strict budget airline limits (usually 7kg/15lbs) to avoid steep gate fees."
+        )
+
+    # 5. Food, Dining & Local Cuisine queries
+    if any(k in msg for k in ["food", "eat", "restaurant", "cafe", "dish", "dining", "cuisine", "taste", "street food"]):
+        return (
+            "🍽️ **Culinary & Dining Guide**\n\n"
+            "📍 **Finding Authentic Eateries:** Walk 2–3 blocks away from main tourist monuments. Look for bustling spots filled with local families.\n"
+            "🌟 **Street Food Safety:** Choose vendors with high turnover and visible cooking grills/woks where meals are prepared fresh and hot.\n"
+            "💵 **Tipping Etiquette:**\n"
+            "• USA/Canada: 15–20% standard.\n"
+            "• Europe: Rounding up or 5–10% for great service.\n"
+            "• Japan/East Asia: Tipping is not customary and can be considered impolite."
+        )
+
+    # 6. Context-Aware response if a trip is active
+    if trip_context:
+        return (
+            f"🌟 **Personalized Travel Advice for Your Trip**\n\n"
+            f"Regarding your inquiry:\n"
+            f"📍 **Pacing:** Avoid packing more than 2 major landmark visits per half-day to prevent travel burnout.\n"
+            f"🎟️ **Reservations:** Book high-demand attractions 4–7 days ahead to skip 2-hour entrance queues.\n"
+            f"🌦️ **Weather Prep:** Always carry a compact umbrella and portable 10,000mAh battery pack for map navigation.\n\n"
+            f"Feel free to ask for neighborhood recommendations, day trip extensions, or food specialties!"
+        )
+
+    # 7. General Friendly Travel Assistant response
+    return (
+        f"🧭 **TravelMate AI Assistant**\n\n"
+        f"Regarding your travel query:\n\n"
+        f"📍 **Destination Insight:** Research local transit options and check seasonal weather trends before departing.\n"
+        f"🎒 **Preparation:** Ensure passport has at least 6 months validity from departure date.\n"
+        f"💵 **Financials:** Inform your bank of international travel and keep emergency cash in local currency.\n\n"
+        f"Feel free to specify a city or ask about budgets, itineraries, packing checklists, or flights!"
+    )
+
 def chat_with_ai(message: str, history: list, trip_context: str = "") -> str:
     model = _get_gemini_model()
     
     if not model:
-        # High quality fallback AI Travel Assistant response
-        lower_msg = message.lower()
-        if "pack" in lower_msg:
-            return (
-                f"🧳 **Smart Packing Checklist**\n\n"
-                f"• Essential documents: Passport, visa, travel insurance, digital & printed booking vouchers\n"
-                f"• Electronics: Universal power adapter, portable power bank, noise-cancelling headphones\n"
-                f"• Clothing: Versatile breathable layers, moisture-wicking shirts, lightweight rain shell, walking shoes\n"
-                f"• Health & Wellness: Basic first-aid kit, prescription medications, SPF 50 sunscreen, hydration tablets\n\n"
-                f"💡 *Pro-tip: Roll your clothes instead of folding to save 30% luggage space!*"
-            )
-        elif "flight" in lower_msg or "cheap" in lower_msg:
-            return (
-                f"✈️ **Flight Booking Hacks & Strategies**\n\n"
-                f"📍 Set price alerts on Google Flights & Skyscanner 6–8 weeks before departure.\n"
-                f"📅 Tuesdays and Wednesdays generally offer the lowest average airfares.\n"
-                f"💳 Use airline co-branded credit cards to waive baggage fees and earn bonus miles.\n"
-                f"🔄 Look out for nearby alternative secondary airports for savings of up to 40%."
-            )
-        elif "hotel" in lower_msg or "stay" in lower_msg:
-            return (
-                f"🏨 **Hotel & Stay Recommendations**\n\n"
-                f"📍 Stay close to central metro/tram stations to reduce daily transit time.\n"
-                f"🌟 Check guest reviews from the past 3 months for updated cleanliness and WiFi reliability.\n"
-                f"💵 Contact the property directly after finding an online rate to ask for complimentary breakfast or room upgrades."
-            )
-        elif trip_context:
-            return (
-                f"🌟 **Tailored Recommendations for Your Trip**\n\n"
-                f"Based on your active trip:\n"
-                f"📍 Ensure you check opening hours for top attractions and pre-book popular experiences.\n"
-                f"🍽️ Allocate about 30% of your daily budget for local food and spontaneous exploration.\n"
-                f"🚶 Plan morning excursions early to beat tourist queues and capture optimal photography lighting.\n\n"
-                f"Feel free to ask for specific restaurant suggestions, safety guidelines, or day-by-day tweaks!"
-            )
-        else:
-            return (
-                f"✨ **TravelMate AI Assistant**\n\n"
-                f"Hello! I am your AI travel companion. I can help you with:\n\n"
-                f"📍 Curating custom day-by-day itineraries tailored to your style and budget\n"
-                f"✈️ Finding flight routes and timing tips\n"
-                f"🏨 Choosing neighborhood stays and accommodations\n"
-                f"🌦️ Checking weather forecasts and packing recommendations\n"
-                f"💡 Local customs, visa prerequisites, and safety advice\n\n"
-                f"Where are you dreaming of traveling next?"
-            )
+        return _generate_fallback_chat(message, trip_context)
 
     system_prompt = (
-        "You are TravelMate AI, an elite, professional, and friendly travel assistant. "
-        "Provide helpful, highly accurate, and beautifully structured travel advice. "
-        "Answer questions about destinations, flights, hotels, visa requirements, packing, local customs, and itineraries.\n\n"
-        "FORMATTING RULES:\n"
-        "1. Use clean spacing and clear paragraphs.\n"
-        "2. When listing items, use colorful travel-themed emojis as bullet points (📍 ✈️ 🏨 📅 🍽️ 💡 💵 🌟).\n"
-        "3. Keep the tone helpful, professional, warm, and engaging."
+        "You are TravelMate AI, an elite, highly knowledgeable, and polite travel consultant.\n\n"
+        "STRICT SCOPE & GUARDRAILS:\n"
+        "1. You ONLY answer questions related to travel, tourism, vacation planning, destination guides, trip budgets, dressing/clothing for climates, weather, flights, hotels, food/dining, packing, and safety.\n"
+        "2. NON-TRAVEL TOPICS: If the user asks about coding, programming, math, physics, homework, general politics, crypto, or non-travel subjects, you MUST politely and humbly decline with a warm response:\n"
+        "'I am your dedicated TravelMate AI assistant, specialized purely in travel planning, destination guides, trip budgets, packing, and weather advice. I cannot assist with non-travel questions, but I would be thrilled to help you explore any city, plan a dream vacation, or budget your next trip!'\n\n"
+        "REALISM & ACCURACY:\n"
+        "- Give realistic and practical advice for budgets (realistic per-day costs), dress codes (cultural modesty vs tropical/cold wear), and seasonal weather.\n"
+        "- Use clean formatting with clear headings, bullet points, and travel emojis (📍 ✈️ 🏨 📅 🍽️ 💡 💵 🌟)."
     )
     
     if trip_context:
-        system_prompt += f"\n\n{trip_context}"
+        system_prompt += f"\n\nACTIVE TRIP CONTEXT:\n{trip_context}"
 
     chat_history = []
     for msg in history:
@@ -277,10 +324,11 @@ def chat_with_ai(message: str, history: list, trip_context: str = "") -> str:
 
     try:
         chat = model.start_chat(history=chat_history)
-        full_message = f"{system_prompt}\n\nUser: {message}"
+        full_message = f"{system_prompt}\n\nUser Question: {message}"
         response = chat.send_message(full_message)
         return response.text
     except Exception as e:
-        print(f"Gemini chat error ({e}), providing assistant fallback.")
-        return f"📍 **TravelMate AI Assistant**\n\nRegarding **{message}**:\n\n• For this destination, research local transit options and book iconic attractions ahead of time.\n• Check seasonal weather conditions to pack appropriate apparel.\n• Feel free to configure your itinerary in the 'Plan Trip' tab for a full day-by-day plan!"
+        print(f"Gemini chat error ({e}), utilizing intelligent assistant fallback.")
+        return _generate_fallback_chat(message, trip_context)
+
 

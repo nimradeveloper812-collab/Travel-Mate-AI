@@ -5,7 +5,6 @@ import {
   LayoutDashboard,
   Compass,
   Sparkles,
-  Plane,
   Hotel,
   CloudSun,
   BookmarkCheck,
@@ -31,10 +30,10 @@ const mainNavItems = [
   { to: '/plan-trip', label: 'Plan Trip', icon: Compass, badge: 'AI' },
   { to: '/saved-trips', label: 'Saved Trips', icon: BookmarkCheck },
   { to: '/chat', label: 'AI Assistant', icon: Sparkles },
-  { to: '/flights', label: 'Flights', icon: Plane },
   { to: '/hotels', label: 'Hotels', icon: Hotel },
   { to: '/weather', label: 'Weather', icon: CloudSun },
 ];
+
 
 const secondaryNavItems = [
   { to: '/profile', label: 'My Profile', icon: User },
