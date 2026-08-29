@@ -153,8 +153,9 @@ export default function Dashboard() {
             {getGreeting()}, {displayName}!
           </h2>
           <p className="text-sm sm:text-base text-sky-100/90 font-medium leading-relaxed">
-            Ready to design your next journey? Create instant day-by-day itineraries, track live flight options, and stay prepared with smart weather forecasts.
+            Ready to design your next journey? Create instant day-by-day itineraries, discover vetted hotel stays, and stay prepared with smart weather forecasts.
           </p>
+
 
           <div className="pt-3 flex flex-wrap gap-3">
             <Link

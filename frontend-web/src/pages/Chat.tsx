@@ -23,10 +23,10 @@ interface Message {
 }
 
 const suggestedPrompts = [
-  'What are the essential packing items for Iceland in winter?',
-  'Give me 5 budget flight hacks to save up to 40%.',
-  'What is the best neighborhood to stay in Tokyo for first-timers?',
-  'Top 3 hidden dining spots in Rome away from crowds.'
+  'What are the best cultural spots and local food in Kyoto?',
+  'How should I pack for a 5-day trip to Paris with fluctuating weather?',
+  'How do I find top budget hotels and hidden travel gems for a weekend trip?',
+  'What are top safety tips and budget hacks for traveling in Rome?'
 ];
 
 export default function Chat() {

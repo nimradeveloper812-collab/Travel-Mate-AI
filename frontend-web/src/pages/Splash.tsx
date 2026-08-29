@@ -115,8 +115,9 @@ export default function Landing() {
               transition={{ delay: 0.2 }}
               className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed"
             >
-              Custom day-by-day itineraries, smart flight route tracking, hotel selections, and real-time weather forecasts powered by personalized AI.
+              Custom day-by-day itineraries, hotel selections, smart budget estimators, and real-time weather forecasts powered by personalized AI.
             </motion.p>
+
 
             {/* Quick Trip Planner Bar */}
             <motion.form

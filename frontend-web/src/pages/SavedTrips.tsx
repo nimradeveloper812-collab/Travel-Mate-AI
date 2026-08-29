@@ -8,7 +8,6 @@ import {
   X,
   Calendar,
   Compass,
-  Plane,
   Hotel,
   Printer,
   Sparkles,
@@ -16,6 +15,7 @@ import {
   CheckSquare,
   Square
 } from 'lucide-react';
+
 
 import api from '../lib/api';
 import { useToast } from '../context/ToastContext';
@@ -156,8 +156,8 @@ export default function SavedTrips() {
       {filteredTrips.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTrips.map((trip) => {
-            const flights = getParsedData(trip.flights_json) || [];
             const hotels = getParsedData(trip.hotels_json) || [];
+
 
             return (
               <motion.div
@@ -185,20 +185,14 @@ export default function SavedTrips() {
                   </div>
 
                   {/* Bookings badges */}
-                  <div className="flex items-center space-x-2 pt-1 text-[11px] font-bold">
-                    {flights.length > 0 && (
-                      <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 flex items-center space-x-1">
-                        <Plane className="w-3 h-3" />
-                        <span>{flights.length} Flight{flights.length > 1 ? 's' : ''}</span>
-                      </span>
-                    )}
-                    {hotels.length > 0 && (
+                  {hotels.length > 0 && (
+                    <div className="flex items-center space-x-2 pt-1 text-[11px] font-bold">
                       <span className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-600 flex items-center space-x-1">
                         <Hotel className="w-3 h-3" />
                         <span>{hotels.length} Hotel{hotels.length > 1 ? 's' : ''}</span>
                       </span>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
@@ -220,13 +214,13 @@ export default function SavedTrips() {
           })}
         </div>
       ) : (
-        <div className="py-20 rounded-3xl border-2 border-dashed border-slate-200 bg-white/60 text-center p-8 space-y-4">
-          <div className="w-16 h-16 rounded-3xl bg-sky-50 text-sky-500 flex items-center justify-center mx-auto">
+        <div className="py-20 rounded-3xl border-2 border-dashed border-slate-200 bg-white/70 text-center p-8 space-y-4 max-w-lg mx-auto">
+          <div className="w-16 h-16 rounded-3xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
             <Compass className="w-8 h-8" />
           </div>
           <div className="space-y-1">
-            <h4 className="text-base font-bold text-slate-700">No saved trips found</h4>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <h3 className="text-lg font-bold text-slate-800">No Itineraries Found</h3>
+            <p className="text-xs text-slate-400">
               {searchQuery || styleFilter !== 'All'
                 ? 'Try adjusting your search keywords or style filters.'
                 : "You haven't saved any trips yet. Generate your first itinerary in the Plan Trip tab!"}
@@ -245,7 +239,6 @@ export default function SavedTrips() {
       <AnimatePresence>
         {selectedTrip && (() => {
           const details = getParsedData(selectedTrip.itinerary_json);
-          const flights = getParsedData(selectedTrip.flights_json) || [];
           const hotels = getParsedData(selectedTrip.hotels_json) || [];
           const notesData = getParsedData(selectedTrip.notes_json);
 
@@ -290,7 +283,7 @@ export default function SavedTrips() {
 
                   {[
                     { id: 'itinerary', label: 'Day-by-Day Plan' },
-                    { id: 'bookings', label: `Flights & Hotels (${flights.length + hotels.length})` },
+                    { id: 'bookings', label: `Hotels & Stays (${hotels.length})` },
                     { id: 'notes', label: 'Packing Checklist & Notes' },
                   ].map((tab) => (
                     <button
@@ -351,51 +344,33 @@ export default function SavedTrips() {
                     </div>
                   )}
 
-                  {/* TAB 2: Bookings */}
+                  {/* TAB 2: Booked Hotels */}
                   {modalTab === 'bookings' && (
                     <div className="space-y-6">
                       <div className="space-y-3">
                         <h4 className="text-sm font-bold text-slate-800 flex items-center space-x-2">
-                          <Plane className="w-4 h-4 text-blue-500" />
-                          <span>Saved Flights ({flights.length})</span>
-                        </h4>
-                        {flights.length > 0 ? (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {flights.map((f: any, i: number) => (
-                              <div key={i} className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5 text-xs">
-                                <p className="font-bold text-slate-800 text-sm">{f.carrier}</p>
-                                <p className="text-slate-500">Departure: {new Date(f.departure).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                                <p className="text-slate-500">Arrival: {new Date(f.arrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                                <p className="text-emerald-600 font-black text-sm pt-1">{f.price}</p>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-xs text-slate-400 italic">No flights linked to this trip yet.</p>
-                        )}
-                      </div>
-
-                      <div className="space-y-3 pt-4 border-t border-slate-100">
-                        <h4 className="text-sm font-bold text-slate-800 flex items-center space-x-2">
                           <Hotel className="w-4 h-4 text-indigo-500" />
-                          <span>Saved Hotels ({hotels.length})</span>
+                          <span>Saved Hotel Accommodations ({hotels.length})</span>
                         </h4>
                         {hotels.length > 0 ? (
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {hotels.map((h: any, i: number) => (
                               <div key={i} className="p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-1.5 text-xs">
                                 <p className="font-bold text-slate-800 text-sm">{h.name}</p>
-                                <p className="text-amber-500">{'★'.repeat(Math.round(h.stars || 3))}</p>
+                                <p className="text-amber-500">{'★'.repeat(Math.round(h.stars || 4))}</p>
                                 <p className="text-emerald-600 font-black text-sm pt-1">${h.price} / night</p>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <p className="text-xs text-slate-400 italic">No hotels linked to this trip yet.</p>
+                          <div className="py-8 text-center text-slate-400 text-xs border border-dashed border-slate-200 rounded-2xl">
+                            No hotels linked to this trip yet. You can find and attach stays in the Hotels tab!
+                          </div>
                         )}
                       </div>
                     </div>
                   )}
+
 
                   {/* TAB 3: Checklist & Notes */}
                   {modalTab === 'notes' && (

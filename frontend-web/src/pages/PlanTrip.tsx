@@ -220,33 +220,63 @@ export default function PlanTrip() {
             </div>
 
             {/* Budget */}
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Total Budget (USD)</label>
-                <span className="text-sm font-extrabold text-emerald-600">${budget}</span>
+                <div className="flex items-center space-x-1">
+                  <span className="text-xs font-bold text-slate-400">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="1000000000000"
+                    value={budget}
+                    onChange={(e) => setBudget(Math.max(0, Number(e.target.value)))}
+                    className="w-24 px-2.5 py-1 text-right text-sm font-black text-emerald-600 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-blue-500 focus:bg-white"
+                  />
+                </div>
               </div>
+
               <input
                 type="range"
-                min="300"
-                max="10000"
-                step="100"
-                value={budget}
+                min="0"
+                max="30000"
+                step="50"
+                value={Math.min(budget, 30000)}
                 onChange={(e) => setBudget(Number(e.target.value))}
                 className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
               />
-              <div className="flex justify-between gap-1">
-                {[500, 1500, 3000, 6000].map((val) => (
+
+              <div className="flex flex-wrap justify-between gap-1">
+                {[0, 500, 1500, 5000, 20000, 100000].map((val) => (
                   <button
                     key={val}
                     type="button"
                     onClick={() => setBudget(val)}
-                    className="text-[10px] font-bold px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-600"
+                    className={`text-[10px] font-bold px-2 py-1 rounded transition-colors ${
+                      budget === val
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                    }`}
                   >
-                    ${val}
+                    ${val >= 1000 ? `${val / 1000}k` : val}
                   </button>
                 ))}
               </div>
+
+              {/* Real-time 2026 Budget Reality Check Warning */}
+              {budget < totalDays * 25 && (
+                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-[11px] text-red-700 font-semibold space-y-1">
+                  <div className="flex items-center space-x-1.5 font-bold text-red-800">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-600" />
+                    <span>2026 Budget Reality Check</span>
+                  </div>
+                  <p className="leading-tight">
+                    ${budget} for {totalDays} days (${(budget / Math.max(1, totalDays)).toFixed(1)}/day) is insufficient for real travel in 2026! Basic lodging, food, and metro require at least ~$35–$50/day.
+                  </p>
+                </div>
+              )}
             </div>
+
 
             {/* Travel Style Selector */}
             <div className="space-y-2">
