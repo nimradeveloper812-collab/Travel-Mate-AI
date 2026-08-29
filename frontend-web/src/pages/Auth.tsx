@@ -132,15 +132,25 @@ export default function Auth() {
         setMode('login');
       }
     } catch (err: any) {
+      console.error('Auth error:', err);
       const detail = err.response?.data?.detail;
-      const errorText = Array.isArray(detail)
-        ? detail.map((d: any) => d.msg).join(', ')
-        : detail || 'Authentication failed. Please check your credentials and try again.';
+      let errorText = 'Authentication failed. Please check your details and try again.';
+      
+      if (Array.isArray(detail)) {
+        errorText = detail.map((d: any) => d.msg).join(', ');
+      } else if (typeof detail === 'string') {
+        errorText = detail;
+      } else if (err.code === 'ERR_NETWORK' || err.message === 'Network Error' || !err.response) {
+        const currentBackend = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+        errorText = `Cannot reach backend at ${currentBackend}. Make sure the Render backend is live and VITE_BACKEND_URL is set in Netlify.`;
+      }
+      
       setErrorMessage(errorText);
-      toastError(errorText, 'Authentication Error');
+      toastError(errorText, 'Authentication Notice');
     } finally {
       setLoading(false);
     }
+
   };
 
   return (
